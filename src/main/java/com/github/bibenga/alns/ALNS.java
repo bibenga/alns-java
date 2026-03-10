@@ -9,9 +9,7 @@ import com.github.bibenga.alns.select.OperatorSelectionScheme;
 import com.github.bibenga.alns.stop.StoppingCriterion;
 
 public class ALNS {
-
     private final RandomGenerator rng;
-
     private final List<Operator> dOps = new ArrayList<>();
     private final List<Operator> rOps = new ArrayList<>();
     private Callback onOutcome;
