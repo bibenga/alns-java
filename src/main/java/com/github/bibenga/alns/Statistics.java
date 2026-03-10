@@ -9,8 +9,8 @@ public class Statistics {
 
     private final List<Double> objectives = new ArrayList<>();
     private final List<Double> runtimes = new ArrayList<>();
-    private final Map<String, int[]> destroyOperatorCounts = new LinkedHashMap<>();
-    private final Map<String, int[]> repairOperatorCounts = new LinkedHashMap<>();
+    private final Map<Integer, int[]> destroyOperatorCounts = new LinkedHashMap<>();
+    private final Map<Integer, int[]> repairOperatorCounts = new LinkedHashMap<>();
 
     public double[] getObjectives() {
         return objectives.stream().mapToDouble(Double::doubleValue).toArray();
@@ -32,11 +32,11 @@ public class Statistics {
         return diffs;
     }
 
-    public Map<String, int[]> getDestroyOperatorCounts() {
+    public Map<Integer, int[]> getDestroyOperatorCounts() {
         return destroyOperatorCounts;
     }
 
-    public Map<String, int[]> getRepairOperatorCounts() {
+    public Map<Integer, int[]> getRepairOperatorCounts() {
         return repairOperatorCounts;
     }
 
@@ -48,11 +48,11 @@ public class Statistics {
         runtimes.add(time);
     }
 
-    public void collectDestroyOperator(String operatorName, Outcome outcome) {
+    public void collectDestroyOperator(Integer operatorName, Outcome outcome) {
         destroyOperatorCounts.computeIfAbsent(operatorName, k -> new int[4])[outcome.getValue()]++;
     }
 
-    public void collectRepairOperator(String operatorName, Outcome outcome) {
+    public void collectRepairOperator(Integer operatorName, Outcome outcome) {
         repairOperatorCounts.computeIfAbsent(operatorName, k -> new int[4])[outcome.getValue()]++;
     }
 }

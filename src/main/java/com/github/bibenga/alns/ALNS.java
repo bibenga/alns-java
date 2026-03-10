@@ -14,8 +14,8 @@ public class ALNS {
 
     private final RandomGenerator rng;
 
-    private final Map<String, Operator> dOps = new LinkedHashMap<>();
-    private final Map<String, Operator> rOps = new LinkedHashMap<>();
+    private final List<Operator> dOps = new ArrayList<>();
+    private final List<Operator> rOps = new ArrayList<>();
     private Callback onOutcome;
 
     public ALNS(RandomGenerator rng) {
@@ -26,22 +26,22 @@ public class ALNS {
         this(RandomGenerator.getDefault());
     }
 
-    public List<Map.Entry<String, Operator>> getDestroyOperators() {
-        return new ArrayList<>(dOps.entrySet());
+    public List<Operator> getDestroyOperators() {
+        return dOps;
     }
 
-    public List<Map.Entry<String, Operator>> getRepairOperators() {
-        return new ArrayList<>(rOps.entrySet());
+    public List<Operator> getRepairOperators() {
+        return rOps;
     }
 
     public void addDestroyOperator(String name, Operator operator) {
         // logger.fine("Adding destroy operator %s.".formatted(name));
-        dOps.put(name, operator);
+        dOps.add(operator);
     }
 
     public void addRepairOperator(String name, Operator operator) {
         // logger.fine("Adding repair operator %s.".formatted(name));
-        rOps.put(name, operator);
+        rOps.add(operator);
     }
 
     public Result iterate(
@@ -52,9 +52,6 @@ public class ALNS {
         if (dOps.isEmpty() || rOps.isEmpty()) {
             throw new IllegalArgumentException("Missing destroy or repair operators.");
         }
-
-        var dOpsList = getDestroyOperators();
-        var rOpsList = getRepairOperators();
 
         State curr = initialSolution;
         State best = initialSolution;
@@ -71,15 +68,15 @@ public class ALNS {
             int dIdx = selected[0];
             int rIdx = selected[1];
 
-            var dEntry = dOpsList.get(dIdx);
-            var rEntry = rOpsList.get(rIdx);
-            String dName = dEntry.getKey();
-            String rName = rEntry.getKey();
+            var dOp = dOps.get(dIdx);
+            var rOp = rOps.get(rIdx);
+            // String dName = dEntry.getKey();
+            // String rName = rEntry.getKey();
 
             // logger.fine("Selected operators %s and %s.".formatted(dName, rName));
 
-            State destroyed = dEntry.getValue().apply(curr, rng);
-            State cand = rEntry.getValue().apply(destroyed, rng);
+            State destroyed = dOp.apply(curr, rng);
+            State cand = rOp.apply(destroyed, rng);
 
             var evalResult = evalCand(accept, best, curr, cand);
             best = evalResult.best();
@@ -89,8 +86,8 @@ public class ALNS {
             opSelect.update(cand, dIdx, rIdx, outcome);
 
             stats.collectObjective(curr.objective());
-            stats.collectDestroyOperator(dName, outcome);
-            stats.collectRepairOperator(rName, outcome);
+            stats.collectDestroyOperator(dIdx, outcome);
+            stats.collectRepairOperator(rIdx, outcome);
             stats.collectRuntime(nanoTime());
         }
 

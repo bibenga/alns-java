@@ -5,7 +5,6 @@ import java.util.random.RandomGenerator;
 import com.github.bibenga.alns.State;
 
 public class MaxIterations implements StoppingCriterion {
-
     private final int maxIterations;
     private int currentIteration = 0;
 
