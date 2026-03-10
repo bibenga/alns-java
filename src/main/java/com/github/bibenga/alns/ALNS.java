@@ -97,7 +97,7 @@ public class ALNS {
             // }
             // // --- end inlined evalCand ---
 
-            select.update(cand, dIdx, rIdx, outcome);
+            select.update(cand, selected, outcome);
 
             stats.collectObjective(curr.objective());
             stats.collectDestroyOperator(dIdx, outcome);

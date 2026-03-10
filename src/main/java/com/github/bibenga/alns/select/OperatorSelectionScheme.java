@@ -8,5 +8,5 @@ import com.github.bibenga.alns.State;
 public interface OperatorSelectionScheme {
     SelectedOperator select(RandomGenerator rng, State best, State curr);
 
-    void update(State candidate, int dIdx, int rIdx, Outcome outcome);
+    void update(State candidate, SelectedOperator op, Outcome outcome);
 }

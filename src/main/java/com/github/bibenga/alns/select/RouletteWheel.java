@@ -82,8 +82,10 @@ public class RouletteWheel extends AvstractOperatorSelectionScheme {
     }
 
     @Override
-    public void update(State candidate, int dIdx, int rIdx, Outcome outcome) {
+    public void update(State candidate, SelectedOperator op, Outcome outcome) {
         double score = scores[outcome.getValue()];
+        var dIdx = op.dIdx();
+        var rIdx = op.rIdx();
         dWeights[dIdx] = decay * dWeights[dIdx] + (1 - decay) * score;
         rWeights[rIdx] = decay * rWeights[rIdx] + (1 - decay) * score;
     }
