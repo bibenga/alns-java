@@ -60,13 +60,10 @@ public class Statistics {
     }
 
     private EnumMap<Outcome, Integer> newCounter() {
-        return new EnumMap<Outcome, Integer>(Outcome.class) {
-            {
-                put(Outcome.BEST, 0);
-                put(Outcome.BETTER, 0);
-                put(Outcome.ACCEPT, 0);
-                put(Outcome.REJECT, 0);
-            }
-        };
+        var c = new EnumMap<Outcome, Integer>(Outcome.class);
+        for (var o : Outcome.values()) {
+            c.put(o, 0);
+        }
+        return c;
     }
 }
