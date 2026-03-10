@@ -1,6 +1,7 @@
 package com.github.bibenga.alns;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,8 @@ public class Statistics {
 
     private final List<Double> objectives = new ArrayList<>();
     private final List<Double> runtimes = new ArrayList<>();
-    private final Map<Integer, int[]> destroyOperatorCounts = new LinkedHashMap<>();
-    private final Map<Integer, int[]> repairOperatorCounts = new LinkedHashMap<>();
+    private final Map<Integer, EnumMap<Outcome, Integer>> destroyOperatorCounts = new LinkedHashMap<>();
+    private final Map<Integer, EnumMap<Outcome, Integer>> repairOperatorCounts = new LinkedHashMap<>();
 
     public int getIterationCount() {
         return objectives.size() - 1;
@@ -36,11 +37,11 @@ public class Statistics {
         return diffs;
     }
 
-    public Map<Integer, int[]> getDestroyOperatorCounts() {
+    public Map<Integer, EnumMap<Outcome, Integer>> getDestroyOperatorCounts() {
         return destroyOperatorCounts;
     }
 
-    public Map<Integer, int[]> getRepairOperatorCounts() {
+    public Map<Integer, EnumMap<Outcome, Integer>> getRepairOperatorCounts() {
         return repairOperatorCounts;
     }
 
@@ -52,12 +53,16 @@ public class Statistics {
         runtimes.add(time);
     }
 
-    public void collectDestroyOperator(Integer operatorName, Outcome outcome) {
-        destroyOperatorCounts.computeIfAbsent(operatorName, k -> new int[4])[outcome.getValue()]++;
+    public void collectDestroyOperator(Integer operatorId, Outcome outcome) {
+        destroyOperatorCounts
+                .computeIfAbsent(operatorId, k -> new EnumMap<>(Outcome.class))
+                .merge(outcome, 1, Integer::sum);
     }
 
-    public void collectRepairOperator(Integer operatorName, Outcome outcome) {
-        repairOperatorCounts.computeIfAbsent(operatorName, k -> new int[4])[outcome.getValue()]++;
+    public void collectRepairOperator(Integer operatorId, Outcome outcome) {
+        repairOperatorCounts
+                .computeIfAbsent(operatorId, k -> new EnumMap<>(Outcome.class))
+                .merge(outcome, 1, Integer::sum);
     }
 
 }

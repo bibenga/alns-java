@@ -27,10 +27,10 @@ public class Tsp {
         int n = COORDS.length;
         int[] nodes = IntStream.range(0, n).toArray();
 
-        Random rnd = new Random(42);
+        Random rng = new Random(42);
 
         TspState initSol = new TspState(nodes, new HashMap<>(), dists);
-        initSol = (TspState) greedyRepair(initSol, rnd);
+        initSol = (TspState) greedyRepair(initSol, rng);
 
         System.out.println("optimal solution: 564");
         System.out.printf("initial solution: %.4f%n", initSol.objective());
@@ -50,7 +50,7 @@ public class Tsp {
         HillClimbing accept = new HillClimbing();
         MaxIterations stop = new MaxIterations(2000);
 
-        ALNS alns = new ALNS(rnd);
+        ALNS alns = new ALNS(rng);
         for (int i = 0; i < destroyOperators.length; i++) {
             alns.addDestroyOperator(destroyNames[i], destroyOperators[i]);
         }
@@ -66,14 +66,14 @@ public class Tsp {
         System.out.printf("statistics: IterationCount=%d; TotalRuntime=%s%n",
                 stat.getIterationCount(),
                 stat.getTotalRuntime());
-        // System.out.println("  destroy operators");
-        // for (int i = 0; i < destroyNames.length; i++) {
-        //     System.out.printf("    %d: %14s; %s%n", i, destroyNames[i], stat.getDestroyOperatorCounts()[i]);
-        // }
-        // System.out.println("  repair operators");
-        // for (int i = 0; i < repairNames.length; i++) {
-        //     System.out.printf("    %d: %14s; %s%n", i, repairNames[i], stat.getRepairOperatorCounts()[i]);
-        // }
+        System.out.println("  destroy operators");
+        for (int i = 0; i < destroyNames.length; i++) {
+            System.out.printf("    %d: %14s; %s%n", i, destroyNames[i], stat.getDestroyOperatorCounts().get(i));
+        }
+        System.out.println("  repair operators");
+        for (int i = 0; i < repairNames.length; i++) {
+            System.out.printf("    %d: %14s; %s%n", i, repairNames[i], stat.getRepairOperatorCounts().get(i));
+        }
 
         // writeDotFile("tsp.dot", COORDS, best.edges);
     }
