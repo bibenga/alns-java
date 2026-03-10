@@ -1,6 +1,7 @@
 package com.github.bibenga.alns.select;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.random.RandomGenerator;
 
 import com.github.bibenga.alns.Outcome;
@@ -8,26 +9,26 @@ import com.github.bibenga.alns.State;
 
 public class RouletteWheel extends AbstractOperatorSelectionScheme {
 
-    private final double[] scores;
+    private final Map<Outcome, Double> scores;
     private final double[] dWeights;
     private final double[] rWeights;
     private final double decay;
 
     public RouletteWheel(
-            double[] scores,
+            Map<Outcome, Double> scores,
             double decay,
             int numDestroy,
             int numRepair,
             boolean[][] opCoupling) {
         super(numDestroy, numRepair, opCoupling);
 
-        for (double s : scores) {
+        for (double s : scores.values()) {
             if (s < 0)
                 throw new IllegalArgumentException("Negative scores are not understood.");
         }
-        if (scores.length < 4) {
+        if (scores.size() < 4) {
             throw new IllegalArgumentException(
-                    "Expected four scores, found %d".formatted(scores.length));
+                    "Expected four scores, found %d".formatted(scores.size()));
         }
         if (decay < 0 || decay > 1) {
             throw new IllegalArgumentException("decay outside [0, 1] not understood.");
@@ -41,11 +42,11 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
         Arrays.fill(rWeights, 1.0);
     }
 
-    public RouletteWheel(double[] scores, double decay, int numDestroy, int numRepair) {
+    public RouletteWheel(Map<Outcome, Double> scores, double decay, int numDestroy, int numRepair) {
         this(scores, decay, numDestroy, numRepair, null);
     }
 
-    public double[] getScores() {
+    public Map<Outcome, Double> getScores() {
         return scores;
     }
 
@@ -83,7 +84,7 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
 
     @Override
     public void update(State candidate, SelectedOperator op, Outcome outcome) {
-        double score = scores[outcome.getValue()];
+        double score = scores.get(outcome);
         var dIdx = op.dIdx();
         var rIdx = op.rIdx();
         dWeights[dIdx] = decay * dWeights[dIdx] + (1 - decay) * score;

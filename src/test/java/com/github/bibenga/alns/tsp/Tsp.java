@@ -43,14 +43,14 @@ public class Tsp {
         Operator[] destroyOperators = { Tsp::randomRemoval, Tsp::pathRemoval, Tsp::worstRemoval };
         Operator[] repairOperators = { Tsp::greedyRepair };
 
-        // var scores = new EnumMap<Outcome, Double>(Outcome.class);
-        // scores.put(Outcome.BEST, 3.0);
-        // scores.put(Outcome.BETTER, 2.0);
-        // scores.put(Outcome.ACCEPT, 1.0);
-        // scores.put(Outcome.REJECT, 0.5);
+        var scores = new EnumMap<>(Map.of(
+                Outcome.BEST, 3.0,
+                Outcome.BETTER, 2.0,
+                Outcome.ACCEPT, 1.0,
+                Outcome.REJECT, 0.5));
 
         RouletteWheel sel = new RouletteWheel(
-                new double[] { 3, 2, 1, 0.5 },
+                scores,
                 0.8,
                 destroyOperators.length,
                 repairOperators.length,
