@@ -110,8 +110,8 @@ public class ALNS {
         return new Result(best, stats);
     }
 
-    public void setOnOutcome(Callback func) {
-        onOutcome = func;
+    public void setOnOutcome(Callback cb) {
+        onOutcome = cb;
     }
 
     private record EvalResult(State best, State curr, Outcome outcome) {
