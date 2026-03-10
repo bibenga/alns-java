@@ -61,26 +61,24 @@ public class RouletteWheel extends AvstractOperatorSelectionScheme {
         return decay;
     }
 
-    /**
-     * Selects a destroy and repair operator pair based on normalised operator
-     * weights. Operators with higher weights are selected with higher probability.
-     *
-     * @return int array {d_idx, r_idx} — indices into destroy and repair operator lists.
-     */
     @Override
     public SelectedOperator select(RandomGenerator rng, State best, State curr) {
-        int dIdx = weightedChoice(rng, dWeights);
+        if (hasOpCoupling()) {
+            int dIdx = weightedChoice(rng, dWeights);
 
-        // Collect coupled repair operator indices for the chosen destroy op
-        boolean[][] coupling = getOpCoupling();
-        int[] coupledR = coupledRepairIndices(coupling[dIdx]);
-        double[] coupledRWeights = new double[coupledR.length];
-        for (int i = 0; i < coupledR.length; i++) {
-            coupledRWeights[i] = rWeights[coupledR[i]];
+            int[] coupledR = coupledRepairIndices(opCoupling[dIdx]);
+            double[] coupledRWeights = new double[coupledR.length];
+            for (int i = 0; i < coupledR.length; i++) {
+                coupledRWeights[i] = rWeights[coupledR[i]];
+            }
+            int rIdx = coupledR[weightedChoice(rng, coupledRWeights)];
+
+            return new SelectedOperator(dIdx, rIdx);
+        } else {
+            int dIdx = weightedChoice(rng, dWeights);
+            int rIdx = weightedChoice(rng, rWeights);
+            return new SelectedOperator(dIdx, rIdx);
         }
-        int rIdx = coupledR[weightedChoice(rng, coupledRWeights)];
-
-        return new SelectedOperator(dIdx, rIdx);
     }
 
     @Override
@@ -90,7 +88,6 @@ public class RouletteWheel extends AvstractOperatorSelectionScheme {
         rWeights[rIdx] = decay * rWeights[rIdx] + (1 - decay) * score;
     }
 
-    /** Samples an index from weights[] proportionally (roulette wheel selection). */
     private static int weightedChoice(RandomGenerator rng, double[] weights) {
         double total = Arrays.stream(weights).sum();
         double r = rng.nextDouble() * total;
@@ -103,12 +100,13 @@ public class RouletteWheel extends AvstractOperatorSelectionScheme {
         return weights.length - 1; // fallback for floating-point edge cases
     }
 
-    /** Returns indices where the coupling row is true. */
     private static int[] coupledRepairIndices(boolean[] couplingRow) {
         int count = 0;
-        for (boolean b : couplingRow)
-            if (b)
+        for (boolean b : couplingRow) {
+            if (b) {
                 count++;
+            }
+        }
         int[] indices = new int[count];
         int k = 0;
         for (int i = 0; i < couplingRow.length; i++) {
