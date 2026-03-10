@@ -38,11 +38,28 @@ public abstract class AbstractOperatorSelectionScheme implements OperatorSelecti
             throw new IllegalArgumentException("Missing destroy or repair operators.");
         }
         if (opCoupling != null) {
-            if (opCoupling.length != numDestroy || opCoupling[0].length != numRepair) {
-                throw new IllegalArgumentException(
-                        "Coupling matrix of shape [%d][%d], expected [%d][%d].".formatted(
-                                opCoupling.length, opCoupling[0].length, numDestroy, numRepair));
+            // if (opCoupling.length != numDestroy || opCoupling[0].length != numRepair) {
+            //     throw new IllegalArgumentException(
+            //             "Coupling matrix of shape (%d, %d), expected (%d, %d)".formatted(
+            //                     opCoupling.length, opCoupling.length > 0 ? opCoupling[0].length : 0,
+            //                     numDestroy, numRepair));
+            // }
+
+            var rows = opCoupling.length;
+            var cols = opCoupling.length > 0 ? opCoupling[0].length : 0;
+            for (int i = 0; i < opCoupling.length; i++) {
+                if (opCoupling[i].length != cols) {
+                    throw new IllegalArgumentException(
+                            "The number of columns in a row %d does not match the expected %d".formatted(i, cols));
+                }
             }
+
+            if (rows != numDestroy || cols != numRepair) {
+                throw new IllegalArgumentException(
+                        "Coupling matrix of shape (%d, %d), expected (%d, %d)".formatted(
+                                rows, cols, numDestroy, numRepair));
+            }
+
             for (int i = 0; i < numDestroy; i++) {
                 boolean hasCoupled = false;
                 for (int j = 0; j < numRepair; j++) {
@@ -53,7 +70,7 @@ public abstract class AbstractOperatorSelectionScheme implements OperatorSelecti
                 }
                 if (!hasCoupled) {
                     throw new IllegalArgumentException(
-                            "Destroy op. %d has no coupled repair operators.".formatted(i));
+                            "Destroy operator %d has no coupled repair operators".formatted(i));
                 }
             }
         }
