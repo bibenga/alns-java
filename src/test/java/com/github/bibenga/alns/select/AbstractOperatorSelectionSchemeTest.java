@@ -25,8 +25,6 @@ public class AbstractOperatorSelectionSchemeTest {
         assertEquals("Missing destroy or repair operators.", ex.getMessage());
     }
 
-    // --- testCouplingValidation ---
-
     @Test
     void testValicCoupling() {
         new DummyOperatorSelection(2, 3,
@@ -66,7 +64,6 @@ public class AbstractOperatorSelectionSchemeTest {
     }
 
     static class DummyOperatorSelection extends AbstractOperatorSelectionScheme {
-
         protected DummyOperatorSelection(int numDestroy, int numRepair) {
             super(numDestroy, numRepair);
         }

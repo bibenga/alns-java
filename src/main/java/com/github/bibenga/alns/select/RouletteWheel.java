@@ -24,14 +24,14 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
 
         for (double s : scores.values()) {
             if (s < 0)
-                throw new IllegalArgumentException("Negative scores are not understood.");
+                throw new IllegalArgumentException("Negative scores are not understood");
         }
         if (scores.size() < 4) {
             throw new IllegalArgumentException(
                     "Expected four scores, found %d".formatted(scores.size()));
         }
         if (decay < 0 || decay > 1) {
-            throw new IllegalArgumentException("decay outside [0, 1] not understood.");
+            throw new IllegalArgumentException("Decay outside [0, 1] not understood.");
         }
 
         this.scores = scores;
