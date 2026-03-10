@@ -57,12 +57,12 @@ public class ALNS {
 
         var stats = new Statistics();
         stats.collectObjective(initObj);
-        stats.collectRuntime(nanoTime());
+        stats.collectRuntime(System.nanoTime());
 
         while (!stop.test(rng, best, curr)) {
             var selected = select.select(rng, best, curr);
-            int dIdx = selected.dIdx();
-            int rIdx = selected.rIdx();
+            var dIdx = selected.dIdx();
+            var rIdx = selected.rIdx();
 
             var dOp = dOps.get(dIdx);
             var rOp = rOps.get(rIdx);
@@ -102,7 +102,7 @@ public class ALNS {
             stats.collectObjective(curr.objective());
             stats.collectDestroyOperator(dIdx, outcome);
             stats.collectRepairOperator(rIdx, outcome);
-            stats.collectRuntime(nanoTime());
+            stats.collectRuntime(System.nanoTime());
         }
 
         // logger.info("Finished iterating in %.2fs.".formatted(stats.getTotalRuntime()));
@@ -134,8 +134,9 @@ public class ALNS {
 
         if (accept.test(rng, best, curr, cand)) {
             outcome = Outcome.ACCEPT;
-            if (cand.objective() < curr.objective())
+            if (cand.objective() < curr.objective()) {
                 outcome = Outcome.BETTER;
+            }
         }
 
         if (cand.objective() < best.objective()) {
@@ -144,9 +145,5 @@ public class ALNS {
         }
 
         return outcome;
-    }
-
-    private static double nanoTime() {
-        return System.nanoTime() / 1_000_000_000.0;
     }
 }

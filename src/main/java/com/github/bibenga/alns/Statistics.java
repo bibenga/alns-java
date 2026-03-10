@@ -1,5 +1,6 @@
 package com.github.bibenga.alns;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -9,7 +10,7 @@ import java.util.Map;
 public class Statistics {
 
     private final List<Double> objectives = new ArrayList<>();
-    private final List<Double> runtimes = new ArrayList<>();
+    private final List<Long> runtimes = new ArrayList<>();
     private final Map<Integer, EnumMap<Outcome, Integer>> destroyOperatorCounts = new LinkedHashMap<>();
     private final Map<Integer, EnumMap<Outcome, Integer>> repairOperatorCounts = new LinkedHashMap<>();
 
@@ -21,12 +22,9 @@ public class Statistics {
         return objectives.stream().mapToDouble(Double::doubleValue).toArray();
     }
 
-    public double getStartTime() {
-        return runtimes.getFirst();
-    }
-
-    public double getTotalRuntime() {
-        return runtimes.getLast() - runtimes.getFirst();
+    public Duration getTotalRuntime() {
+        var d = runtimes.getLast() - runtimes.getFirst();
+        return Duration.ofNanos(d);
     }
 
     public double[] getRuntimes() {
@@ -49,17 +47,17 @@ public class Statistics {
         objectives.add(objective);
     }
 
-    public void collectRuntime(double time) {
+    public void collectRuntime(long time) {
         runtimes.add(time);
     }
 
-    public void collectDestroyOperator(Integer operatorId, Outcome outcome) {
+    public void collectDestroyOperator(int operatorId, Outcome outcome) {
         destroyOperatorCounts
                 .computeIfAbsent(operatorId, k -> new EnumMap<>(Outcome.class))
                 .merge(outcome, 1, Integer::sum);
     }
 
-    public void collectRepairOperator(Integer operatorId, Outcome outcome) {
+    public void collectRepairOperator(int operatorId, Outcome outcome) {
         repairOperatorCounts
                 .computeIfAbsent(operatorId, k -> new EnumMap<>(Outcome.class))
                 .merge(outcome, 1, Integer::sum);
