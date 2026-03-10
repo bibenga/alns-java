@@ -49,14 +49,24 @@ public class Statistics {
 
     public void collectDestroyOperator(int operatorId, Outcome outcome) {
         destroyOperatorCounts
-                .computeIfAbsent(operatorId, k -> new EnumMap<>(Outcome.class))
+                .computeIfAbsent(operatorId, k -> newCounter())
                 .merge(outcome, 1, Integer::sum);
     }
 
     public void collectRepairOperator(int operatorId, Outcome outcome) {
         repairOperatorCounts
-                .computeIfAbsent(operatorId, k -> new EnumMap<>(Outcome.class))
+                .computeIfAbsent(operatorId, k -> newCounter())
                 .merge(outcome, 1, Integer::sum);
     }
 
+    private EnumMap<Outcome, Integer> newCounter() {
+        return new EnumMap<Outcome, Integer>(Outcome.class) {
+            {
+                put(Outcome.BEST, 0);
+                put(Outcome.BETTER, 0);
+                put(Outcome.ACCEPT, 0);
+                put(Outcome.REJECT, 0);
+            }
+        };
+    }
 }
