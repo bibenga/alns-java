@@ -1,19 +1,19 @@
 package com.github.bibenga.alns.select;
 
-public abstract class AvstractOperatorSelectionScheme implements OperatorSelectionScheme {
+public abstract class AbstractOperatorSelectionScheme implements OperatorSelectionScheme {
 
     protected final int numDestroy;
     protected final int numRepair;
     protected final boolean[][] opCoupling;
 
-    protected AvstractOperatorSelectionScheme(int numDestroy, int numRepair, boolean[][] opCoupling) {
+    protected AbstractOperatorSelectionScheme(int numDestroy, int numRepair, boolean[][] opCoupling) {
         validateArguments(numDestroy, numRepair, opCoupling);
         this.numDestroy = numDestroy;
         this.numRepair = numRepair;
         this.opCoupling = opCoupling;
     }
 
-    protected AvstractOperatorSelectionScheme(int numDestroy, int numRepair) {
+    protected AbstractOperatorSelectionScheme(int numDestroy, int numRepair) {
         this(numDestroy, numRepair, null);
     }
 

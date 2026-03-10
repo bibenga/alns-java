@@ -6,7 +6,7 @@ import java.util.random.RandomGenerator;
 import com.github.bibenga.alns.Outcome;
 import com.github.bibenga.alns.State;
 
-public class RouletteWheel extends AvstractOperatorSelectionScheme {
+public class RouletteWheel extends AbstractOperatorSelectionScheme {
 
     private final double[] scores;
     private final double[] dWeights;
