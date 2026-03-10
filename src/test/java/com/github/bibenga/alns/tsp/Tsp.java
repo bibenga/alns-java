@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.stream.IntStream;
 
 import com.github.bibenga.alns.ALNS;
 import com.github.bibenga.alns.Operator;
+import com.github.bibenga.alns.Outcome;
 import com.github.bibenga.alns.State;
 import com.github.bibenga.alns.accept.HillClimbing;
 import com.github.bibenga.alns.select.RouletteWheel;
@@ -40,6 +42,12 @@ public class Tsp {
 
         Operator[] destroyOperators = { Tsp::randomRemoval, Tsp::pathRemoval, Tsp::worstRemoval };
         Operator[] repairOperators = { Tsp::greedyRepair };
+
+        // var scores = new EnumMap<Outcome, Double>(Outcome.class);
+        // scores.put(Outcome.BEST, 3.0);
+        // scores.put(Outcome.BETTER, 2.0);
+        // scores.put(Outcome.ACCEPT, 1.0);
+        // scores.put(Outcome.REJECT, 0.5);
 
         RouletteWheel sel = new RouletteWheel(
                 new double[] { 3, 2, 1, 0.5 },
