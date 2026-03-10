@@ -12,6 +12,10 @@ public class Statistics {
     private final Map<Integer, int[]> destroyOperatorCounts = new LinkedHashMap<>();
     private final Map<Integer, int[]> repairOperatorCounts = new LinkedHashMap<>();
 
+    public int getIterationCount() {
+        return objectives.size() - 1;
+    }
+
     public double[] getObjectives() {
         return objectives.stream().mapToDouble(Double::doubleValue).toArray();
     }
@@ -55,4 +59,5 @@ public class Statistics {
     public void collectRepairOperator(Integer operatorName, Outcome outcome) {
         repairOperatorCounts.computeIfAbsent(operatorName, k -> new int[4])[outcome.getValue()]++;
     }
+
 }

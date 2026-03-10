@@ -1,7 +1,6 @@
 package com.github.bibenga.alns.select;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.random.RandomGenerator;
 
 import com.github.bibenga.alns.Outcome;
