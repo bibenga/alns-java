@@ -91,7 +91,7 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
     }
 
     private static int weightedChoice(RandomGenerator rng, double[] weights) {
-        double total = Arrays.stream(weights).sum();
+        double total = getTotal(weights);
         double r = rng.nextDouble() * total;
         double cumulative = 0;
         for (int i = 0; i < weights.length; i++) {
@@ -100,6 +100,15 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
                 return i;
         }
         return weights.length - 1; // fallback for floating-point edge cases
+    }
+
+    private static double getTotal(double[] weights) {
+        // return Arrays.stream(weights).sum();
+        double total = 0.0;
+        for (double w : weights) {
+            total += w;
+        }
+        return total;
     }
 
     private static int[] coupledRepairIndices(boolean[] couplingRow) {
