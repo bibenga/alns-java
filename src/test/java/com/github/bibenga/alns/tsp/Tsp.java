@@ -237,7 +237,7 @@ public class Tsp {
     }
 
     public static State randomRemoval(State state, RandomGenerator rng) {
-        TspState destroyed = ((TspState) state).cloneState();
+        TspState destroyed = ((TspState) state).clone();
         int toRemove = edgesToRemove(destroyed);
         int removed = 0;
         while (removed < toRemove) {
@@ -251,7 +251,7 @@ public class Tsp {
     }
 
     public static State pathRemoval(State state, RandomGenerator rng) {
-        TspState destroyed = ((TspState) state).cloneState();
+        TspState destroyed = ((TspState) state).clone();
         int node = destroyed.nodes[rng.nextInt(destroyed.nodes.length)];
         int toRemove = edgesToRemove(destroyed);
         for (int i = 0; i < toRemove; i++) {
@@ -263,7 +263,7 @@ public class Tsp {
     }
 
     public static State worstRemoval(State state, RandomGenerator rng) {
-        var destroyed = ((TspState) state).cloneState();
+        var destroyed = ((TspState) state).clone();
         int[] worstEdges = destroyed.nodes.clone();
         // sort ascending by edge distance so we can remove from the end
         Integer[] boxed = Arrays.stream(worstEdges).boxed().toArray(Integer[]::new);

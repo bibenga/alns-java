@@ -6,7 +6,6 @@ import java.util.Map;
 import com.github.bibenga.alns.State;
 
 class TspState implements State {
-
     final int[] nodes;
     final Map<Integer, Integer> edges;
     final double[][] dists;
@@ -18,7 +17,8 @@ class TspState implements State {
         this.dists = dists;
     }
 
-    public TspState cloneState() {
+    @Override
+    public TspState clone() {
         return new TspState(nodes, new HashMap<>(edges), dists);
     }
 
