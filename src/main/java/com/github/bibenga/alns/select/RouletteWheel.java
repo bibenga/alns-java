@@ -7,26 +7,6 @@ import java.util.random.RandomGenerator;
 import com.github.bibenga.alns.Outcome;
 import com.github.bibenga.alns.State;
 
-/**
- * The RouletteWheel scheme updates operator weights as a convex combination
- * of the current weight and the new score.
- * <p>
- * When the algorithm starts, all operators i are assigned weight w_i = 1.
- * After observing outcome j, the weights of the selected destroy (d) and
- * repair (r) operators are updated as:
- * <pre>
- *   w_d = theta * w_d + (1 - theta) * s_j
- *   w_r = theta * w_r + (1 - theta) * s_j
- * </pre>
- * where 0 &le; theta &le; 1 is the operator decay rate.
- *
- * @param scores      Four non-negative scores for outcomes: new global best (0),
- *                    better than current (1), accepted (2), rejected (3).
- * @param decay       Operator decay parameter theta in [0, 1].
- * @param numDestroy  Number of destroy operators.
- * @param numRepair   Number of repair operators.
- * @param opCoupling  Optional coupling matrix between destroy and repair operators.
- */
 public class RouletteWheel extends OperatorSelectionScheme {
 
     private final double[] scores;
