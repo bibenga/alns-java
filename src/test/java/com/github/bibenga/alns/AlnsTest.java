@@ -1,12 +1,10 @@
 package com.github.bibenga.alns;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.random.RandomGenerator;
 
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +52,9 @@ class AlnsTest {
         a.addDestroyOperator("destroyOp", destroyOp);
         a.addRepairOperator("repairOp", repairOp);
 
-        Result res = assertDoesNotThrow(() -> a.iterate(initSol, opSelect, accept, stop));
+        Result res = a.iterate(initSol, opSelect, accept, stop);
+
+        assertEquals(res.bestState().objective(), lastBest[0]);
 
         assertEquals(total, destroyCalled[0],
                 "%d destroy calls expected, actual %d calls".formatted(total, destroyCalled[0]));
