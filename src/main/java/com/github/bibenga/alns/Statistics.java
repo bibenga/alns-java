@@ -2,6 +2,7 @@ package com.github.bibenga.alns;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,21 +19,16 @@ public class Statistics {
         return objectives.size() - 1;
     }
 
-    public double[] getObjectives() {
-        return objectives.stream().mapToDouble(Double::doubleValue).toArray();
+    public Collection<Double> getObjectives() {
+        return objectives;
+    }
+
+    public Collection<Long> getRuntimes() {
+        return runtimes;
     }
 
     public Duration getTotalRuntime() {
-        var d = runtimes.getLast() - runtimes.getFirst();
-        return Duration.ofNanos(d);
-    }
-
-    public double[] getRuntimes() {
-        double[] diffs = new double[runtimes.size() - 1];
-        for (int i = 0; i < diffs.length; i++) {
-            diffs[i] = runtimes.get(i + 1) - runtimes.get(i);
-        }
-        return diffs;
+        return Duration.ofNanos(runtimes.getLast() - runtimes.getFirst());
     }
 
     public Map<Integer, EnumMap<Outcome, Integer>> getDestroyOperatorCounts() {
