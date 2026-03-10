@@ -2,7 +2,7 @@ package com.github.bibenga.alns;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,12 +19,12 @@ public class Statistics {
         return objectives.size() - 1;
     }
 
-    public Collection<Double> getObjectives() {
-        return objectives;
+    public List<Double> getObjectives() {
+        return Collections.unmodifiableList(objectives);
     }
 
-    public Collection<Long> getRuntimes() {
-        return runtimes;
+    public List<Long> getRuntimes() {
+        return Collections.unmodifiableList(runtimes);
     }
 
     public Duration getTotalRuntime() {
@@ -32,30 +32,32 @@ public class Statistics {
     }
 
     public Map<Integer, EnumMap<Outcome, Integer>> getDestroyOperatorCounts() {
-        return destroyOperatorCounts;
+        // TODO: value is still modifible
+        return Collections.unmodifiableMap(destroyOperatorCounts);
     }
 
     public Map<Integer, EnumMap<Outcome, Integer>> getRepairOperatorCounts() {
-        return repairOperatorCounts;
+        // TODO: value is still modifible
+        return Collections.unmodifiableMap(repairOperatorCounts);
     }
 
-    public void collectObjective(double objective) {
+    void collectObjective(double objective) {
         objectives.add(objective);
     }
 
-    public void collectRuntime(long time) {
+    void collectRuntime(long time) {
         runtimes.add(time);
     }
 
-    public void collectDestroyOperator(int operatorId, Outcome outcome) {
+    void collectDestroyOperator(int oIdx, Outcome outcome) {
         destroyOperatorCounts
-                .computeIfAbsent(operatorId, k -> newCounter())
+                .computeIfAbsent(oIdx, k -> newCounter())
                 .merge(outcome, 1, Integer::sum);
     }
 
-    public void collectRepairOperator(int operatorId, Outcome outcome) {
+    void collectRepairOperator(int oIdx, Outcome outcome) {
         repairOperatorCounts
-                .computeIfAbsent(operatorId, k -> newCounter())
+                .computeIfAbsent(oIdx, k -> newCounter())
                 .merge(outcome, 1, Integer::sum);
     }
 
