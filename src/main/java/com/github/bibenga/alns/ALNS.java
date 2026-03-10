@@ -1,0 +1,143 @@
+package com.github.bibenga.alns;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.random.RandomGenerator;
+
+import com.github.bibenga.alns.accept.AcceptanceCriterion;
+import com.github.bibenga.alns.select.OperatorSelectionScheme;
+import com.github.bibenga.alns.stop.StoppingCriterion;
+
+public class ALNS {
+
+    private final RandomGenerator rng;
+
+    private final Map<String, Operator> dOps = new LinkedHashMap<>();
+    private final Map<String, Operator> rOps = new LinkedHashMap<>();
+    private Callback onOutcome;
+
+    public ALNS(RandomGenerator rng) {
+        this.rng = rng;
+    }
+
+    public ALNS() {
+        this(RandomGenerator.getDefault());
+    }
+
+    public List<Map.Entry<String, Operator>> getDestroyOperators() {
+        return new ArrayList<>(dOps.entrySet());
+    }
+
+    public List<Map.Entry<String, Operator>> getRepairOperators() {
+        return new ArrayList<>(rOps.entrySet());
+    }
+
+    public void addDestroyOperator(String name, Operator operator) {
+        // logger.fine("Adding destroy operator %s.".formatted(name));
+        dOps.put(name, operator);
+    }
+
+    public void addRepairOperator(String name, Operator operator) {
+        // logger.fine("Adding repair operator %s.".formatted(name));
+        rOps.put(name, operator);
+    }
+
+    public Result iterate(
+            State initialSolution,
+            OperatorSelectionScheme opSelect,
+            AcceptanceCriterion accept,
+            StoppingCriterion stop) {
+        if (dOps.isEmpty() || rOps.isEmpty()) {
+            throw new IllegalArgumentException("Missing destroy or repair operators.");
+        }
+
+        var dOpsList = getDestroyOperators();
+        var rOpsList = getRepairOperators();
+
+        State curr = initialSolution;
+        State best = initialSolution;
+        double initObj = initialSolution.objective();
+
+        // logger.fine("Initial solution has objective %.2f.".formatted(initObj));
+
+        var stats = new Statistics();
+        stats.collectObjective(initObj);
+        stats.collectRuntime(nanoTime());
+
+        while (!stop.test(rng, best, curr)) {
+            int[] selected = opSelect.select(rng, best, curr);
+            int dIdx = selected[0];
+            int rIdx = selected[1];
+
+            var dEntry = dOpsList.get(dIdx);
+            var rEntry = rOpsList.get(rIdx);
+            String dName = dEntry.getKey();
+            String rName = rEntry.getKey();
+
+            // logger.fine("Selected operators %s and %s.".formatted(dName, rName));
+
+            State destroyed = dEntry.getValue().apply(curr, rng);
+            State cand = rEntry.getValue().apply(destroyed, rng);
+
+            var evalResult = evalCand(accept, best, curr, cand);
+            best = evalResult.best();
+            curr = evalResult.curr();
+            Outcome outcome = evalResult.outcome();
+
+            opSelect.update(cand, dIdx, rIdx, outcome);
+
+            stats.collectObjective(curr.objective());
+            stats.collectDestroyOperator(dName, outcome);
+            stats.collectRepairOperator(rName, outcome);
+            stats.collectRuntime(nanoTime());
+        }
+
+        // logger.info("Finished iterating in %.2fs.".formatted(stats.getTotalRuntime()));
+
+        return new Result(best, stats);
+    }
+
+    public void onOutcome(Callback func) {
+        onOutcome = func;
+    }
+
+    private record EvalResult(State best, State curr, Outcome outcome) {
+    }
+
+    private EvalResult evalCand(AcceptanceCriterion accept, State best, State curr, State cand) {
+        Outcome outcome = determineOutcome(accept, best, curr, cand);
+
+        if (onOutcome != null) {
+            onOutcome.call(outcome, cand, rng);
+        }
+
+        return switch (outcome) {
+            case BEST -> new EvalResult(cand, cand, outcome);
+            case REJECT -> new EvalResult(best, curr, outcome);
+            default -> new EvalResult(best, cand, outcome);
+        };
+    }
+
+    private Outcome determineOutcome(AcceptanceCriterion accept, State best, State curr, State cand) {
+        Outcome outcome = Outcome.REJECT;
+
+        if (accept.test(rng, best, curr, cand)) {
+            outcome = Outcome.ACCEPT;
+            if (cand.objective() < curr.objective())
+                outcome = Outcome.BETTER;
+        }
+
+        if (cand.objective() < best.objective()) {
+            // logger.info("New best with objective %.2f.".formatted(cand.objective()));
+            outcome = Outcome.BEST;
+        }
+
+        return outcome;
+    }
+
+    private static double nanoTime() {
+        return System.nanoTime() / 1_000_000_000.0;
+    }
+}
