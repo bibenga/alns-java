@@ -68,7 +68,7 @@ public class RouletteWheel extends AvstractOperatorSelectionScheme {
      * @return int array {d_idx, r_idx} — indices into destroy and repair operator lists.
      */
     @Override
-    public int[] select(RandomGenerator rng, State best, State curr) {
+    public SelectedOperator select(RandomGenerator rng, State best, State curr) {
         int dIdx = weightedChoice(rng, dWeights);
 
         // Collect coupled repair operator indices for the chosen destroy op
@@ -80,7 +80,7 @@ public class RouletteWheel extends AvstractOperatorSelectionScheme {
         }
         int rIdx = coupledR[weightedChoice(rng, coupledRWeights)];
 
-        return new int[] { dIdx, rIdx };
+        return new SelectedOperator(dIdx, rIdx);
     }
 
     @Override

@@ -60,9 +60,9 @@ public class ALNS {
         stats.collectRuntime(nanoTime());
 
         while (!stop.test(rng, best, curr)) {
-            int[] selected = select.select(rng, best, curr);
-            int dIdx = selected[0];
-            int rIdx = selected[1];
+            var selected = select.select(rng, best, curr);
+            int dIdx = selected.dIdx();
+            int rIdx = selected.rIdx();
 
             var dOp = dOps.get(dIdx);
             var rOp = rOps.get(rIdx);
@@ -74,28 +74,28 @@ public class ALNS {
             State destroyed = dOp.apply(curr, rng);
             State cand = rOp.apply(destroyed, rng);
 
-            // var evalResult = evalCand(accept, best, curr, cand);
-            // best = evalResult.best();
-            // curr = evalResult.curr();
-            // Outcome outcome = evalResult.outcome();
+            var evalResult = evalCand(accept, best, curr, cand);
+            best = evalResult.best();
+            curr = evalResult.curr();
+            Outcome outcome = evalResult.outcome();
 
-            // --- inlined evalCand ---
-            Outcome outcome = determineOutcome(accept, best, curr, cand);
-            if (onOutcome != null) {
-                onOutcome.call(outcome, cand, rng);
-            }
-            switch (outcome) {
-                case BEST -> {
-                    best = cand;
-                    curr = cand;
-                }
-                case REJECT -> {
-                }
-                default -> {
-                    curr = cand;
-                }
-            }
-            // --- end inlined evalCand ---
+            // // --- inlined evalCand ---
+            // Outcome outcome = determineOutcome(accept, best, curr, cand);
+            // if (onOutcome != null) {
+            //     onOutcome.call(outcome, cand, rng);
+            // }
+            // switch (outcome) {
+            //     case BEST -> {
+            //         best = cand;
+            //         curr = cand;
+            //     }
+            //     case REJECT -> {
+            //     }
+            //     default -> {
+            //         curr = cand;
+            //     }
+            // }
+            // // --- end inlined evalCand ---
 
             select.update(cand, dIdx, rIdx, outcome);
 
@@ -114,22 +114,20 @@ public class ALNS {
         onOutcome = func;
     }
 
-    // private record EvalResult(State best, State curr, Outcome outcome) {
-    // }
+    private record EvalResult(State best, State curr, Outcome outcome) {
+    }
 
-    // private EvalResult evalCand(AcceptanceCriterion accept, State best, State curr, State cand) {
-    //     Outcome outcome = determineOutcome(accept, best, curr, cand);
-    // 
-    //     if (onOutcome != null) {
-    //         onOutcome.call(outcome, cand, rng);
-    //     }
-    // 
-    //     return switch (outcome) {
-    //         case BEST -> new EvalResult(cand, cand, outcome);
-    //         case REJECT -> new EvalResult(best, curr, outcome);
-    //         default -> new EvalResult(best, cand, outcome);
-    //     };
-    // }
+    private EvalResult evalCand(AcceptanceCriterion accept, State best, State curr, State cand) {
+        Outcome outcome = determineOutcome(accept, best, curr, cand);
+        if (onOutcome != null) {
+            onOutcome.call(outcome, cand, rng);
+        }
+        return switch (outcome) {
+            case BEST -> new EvalResult(cand, cand, outcome);
+            case REJECT -> new EvalResult(best, curr, outcome);
+            default -> new EvalResult(best, cand, outcome);
+        };
+    }
 
     private Outcome determineOutcome(AcceptanceCriterion accept, State best, State curr, State cand) {
         Outcome outcome = Outcome.REJECT;
