@@ -2,7 +2,7 @@ package com.github.bibenga.alns;
 
 public class FakeState implements State {
 
-    private final double objective;
+    private double objective;
 
     public FakeState(double objective) {
         this.objective = objective;
@@ -10,6 +10,10 @@ public class FakeState implements State {
 
     public FakeState clone() {
         return new FakeState(0.0);
+    }
+
+    public void setObjective(double objective) {
+        this.objective = objective;
     }
 
     public double objective() {

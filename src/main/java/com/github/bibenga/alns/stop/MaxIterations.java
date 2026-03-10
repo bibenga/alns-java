@@ -19,7 +19,7 @@ public class MaxIterations implements StoppingCriterion {
         return maxIterations;
     }
 
-    int getCurrentIteration() {
+    public int getCurrentIteration() {
         return currentIteration;
     }
 
