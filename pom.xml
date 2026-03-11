@@ -7,6 +7,9 @@
     <artifactId>alns</artifactId>
     <version>${alns.version}</version>
     <packaging>jar</packaging>
+
+    <name>ALNS</name>
+    <description>Adaptive Large Neighbourhood Search for Java</description>
     <url>https://github.com/bibenga/alns-java</url>
 
     <properties>
