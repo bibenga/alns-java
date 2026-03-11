@@ -13,6 +13,7 @@ public class ALNS {
     private final List<Operator> dOps = new ArrayList<>();
     private final List<Operator> rOps = new ArrayList<>();
     private Callback onOutcome;
+    private boolean collectObjectives;
 
     public ALNS(RandomGenerator rng) {
         this.rng = rng;
@@ -40,6 +41,10 @@ public class ALNS {
         rOps.add(operator);
     }
 
+    public void setCollectObjectives(boolean collectObjectives) {
+        this.collectObjectives = collectObjectives;
+    }
+
     public Result iterate(
             State initSol,
             OperatorSelectionScheme select,
@@ -56,8 +61,10 @@ public class ALNS {
         // logger.fine("Initial solution has objective %.2f.".formatted(initObj));
 
         var stats = new Statistics();
-        stats.collectObjective(initObj);
-        stats.collectRuntime(System.nanoTime());
+        if (collectObjectives) {
+            stats.collectObjective(initObj);
+            stats.collectRuntime(System.nanoTime());
+        }
 
         while (!stop.isDone(rng, best, curr)) {
             var op = select.select(rng, best, curr);
@@ -99,10 +106,12 @@ public class ALNS {
 
             select.update(cand, op, outcome);
 
-            stats.collectObjective(curr.objective());
             stats.collectDestroyOperator(dIdx, outcome);
             stats.collectRepairOperator(rIdx, outcome);
-            stats.collectRuntime(System.nanoTime());
+            if (collectObjectives) {
+                stats.collectObjective(curr.objective());
+                stats.collectRuntime(System.nanoTime());
+            }
         }
 
         // logger.info("Finished iterating in %.2fs.".formatted(stats.getTotalRuntime()));

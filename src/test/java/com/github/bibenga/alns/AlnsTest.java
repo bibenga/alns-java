@@ -23,8 +23,8 @@ class AlnsTest {
         HillClimbing accept = new HillClimbing();
         MaxIterations stop = new MaxIterations(total);
 
-        Random rnd = new Random();
-        double[] lastBest = { rnd.nextDouble() };
+        Random rng = new Random();
+        double[] lastBest = { rng.nextDouble() };
         FakeState initSol = new FakeState(lastBest[0]);
 
         int[] bestCount = { 0 };
@@ -40,7 +40,7 @@ class AlnsTest {
         Operator repairOp = (state, r) -> {
             repairCalled[0]++;
             FakeState current = (FakeState) state;
-            current.setObjective(rnd.nextDouble());
+            current.setObjective(rng.nextDouble());
             if (current.objective() < lastBest[0]) {
                 lastBest[0] = current.objective();
                 bestCount[0]++;
@@ -48,7 +48,8 @@ class AlnsTest {
             return current;
         };
 
-        ALNS a = new ALNS(rnd);
+        ALNS a = new ALNS(rng);
+        a.setCollectObjectives(true);
         a.addDestroyOperator("destroyOp", destroyOp);
         a.addRepairOperator("repairOp", repairOp);
 
