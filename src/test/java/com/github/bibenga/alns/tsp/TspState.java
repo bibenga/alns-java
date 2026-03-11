@@ -1,8 +1,5 @@
 package com.github.bibenga.alns.tsp;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.collections.api.map.primitive.MutableIntIntMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 
