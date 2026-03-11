@@ -244,8 +244,7 @@ public class Tsp {
         int removed = 0;
         while (removed < toRemove) {
             int node = destroyed.nodes[rng.nextInt(destroyed.nodes.length)];
-            if (destroyed.edges.containsKey(node)) {
-                destroyed.edges.remove(node);
+            if (destroyed.edges.remove(node) != null) {
                 removed++;
             }
         }
