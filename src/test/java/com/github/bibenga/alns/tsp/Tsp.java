@@ -217,9 +217,9 @@ public class Tsp {
     static double[][] buildDists(double[][] coords) {
         int n = coords.length;
         double[][] d = new double[n][n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                d[i][j] = euclidean(coords[i][0], coords[i][1], coords[j][0], coords[j][1]);
+        for (int p1 = 0; p1 < n; p1++) {
+            for (int p2 = 0; p2 < n; p2++) {
+                d[p1][p2] = euclidean(coords[p1][0], coords[p1][1], coords[p2][0], coords[p2][1]);
             }
         }
         return d;
@@ -244,8 +244,7 @@ public class Tsp {
         int removed = 0;
         while (removed < toRemove) {
             int node = destroyed.nodes[rng.nextInt(destroyed.nodes.length)];
-            if (destroyed.edges.containsKey(node)) {
-                destroyed.edges.remove(node);
+            if (destroyed.edges.remove(node) != null) {
                 removed++;
             }
         }
