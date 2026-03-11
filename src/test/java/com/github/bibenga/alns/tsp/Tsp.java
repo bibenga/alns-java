@@ -304,17 +304,17 @@ public class Tsp {
             if (node == -1)
                 throw new RuntimeException("node not found");
 
-            final int finalNode = node;
+            final int fNode = node;
             List<Integer> unvisited = new ArrayList<>();
             for (int other : cur.nodes) {
-                if (other != finalNode && !visited.contains(other) && !wouldFormSubcycle(finalNode, other, cur))
+                if (other != fNode && !visited.contains(other) && !wouldFormSubcycle(fNode, other, cur))
                     unvisited.add(other);
             }
             if (unvisited.isEmpty())
                 throw new RuntimeException("unvisited is empty");
 
             int nearest = unvisited.stream()
-                    .min(Comparator.comparingDouble(a -> cur.dists[finalNode][a]))
+                    .min(Comparator.comparingDouble(a -> cur.dists[fNode][a]))
                     .orElseThrow();
 
             cur.edges.put(node, nearest);
