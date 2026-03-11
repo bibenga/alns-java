@@ -38,13 +38,6 @@ public abstract class AbstractOperatorSelectionScheme implements OperatorSelecti
             throw new IllegalArgumentException("Missing destroy or repair operators");
         }
         if (opCoupling != null) {
-            // if (opCoupling.length != numDestroy || opCoupling[0].length != numRepair) {
-            //     throw new IllegalArgumentException(
-            //             "Coupling matrix of shape (%d, %d), expected (%d, %d)".formatted(
-            //                     opCoupling.length, opCoupling.length > 0 ? opCoupling[0].length : 0,
-            //                     numDestroy, numRepair));
-            // }
-
             var rows = opCoupling.length;
             var cols = opCoupling.length > 0 && opCoupling[0] != null ? opCoupling[0].length : 0;
             if (rows != numDestroy || cols != numRepair) {
