@@ -13,7 +13,7 @@ class MaxRuntimeTest {
         MaxRuntime stop = new MaxRuntime(Duration.ofMillis(100));
         Instant started = Instant.now();
         while (true) {
-            if (stop.test(null, null, null))
+            if (stop.isDone(null, null, null))
                 break;
             Thread.sleep(1);
         }

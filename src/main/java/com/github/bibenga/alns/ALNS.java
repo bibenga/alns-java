@@ -59,7 +59,7 @@ public class ALNS {
         stats.collectObjective(initObj);
         stats.collectRuntime(System.nanoTime());
 
-        while (!stop.test(rng, best, curr)) {
+        while (!stop.isDone(rng, best, curr)) {
             var op = select.select(rng, best, curr);
             var dIdx = op.dIdx();
             var rIdx = op.rIdx();
@@ -132,7 +132,7 @@ public class ALNS {
     private Outcome determineOutcome(AcceptanceCriterion accept, State best, State curr, State cand) {
         Outcome outcome = Outcome.REJECT;
 
-        if (accept.test(rng, best, curr, cand)) {
+        if (accept.isAccept(rng, best, curr, cand)) {
             outcome = Outcome.ACCEPT;
             if (cand.objective() < curr.objective()) {
                 outcome = Outcome.BETTER;

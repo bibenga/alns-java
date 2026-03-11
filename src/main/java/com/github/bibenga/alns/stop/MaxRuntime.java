@@ -20,7 +20,7 @@ public class MaxRuntime implements StoppingCriterion {
         return Duration.ofNanos(maxRuntime);
     }
 
-    public boolean test(RandomGenerator rng, State best, State current) {
+    public boolean isDone(RandomGenerator rng, State best, State current) {
         if (startRuntime < 0) {
             startRuntime = System.nanoTime();
         }

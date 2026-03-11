@@ -10,7 +10,7 @@ class MaxIterationsTest {
         MaxIterations stop = new MaxIterations(10);
         int i = 0;
         while (true) {
-            if (stop.test(null, null, null))
+            if (stop.isDone(null, null, null))
                 break;
             i++;
         }

@@ -15,12 +15,12 @@ class HillClimbingTest {
     @Test
     void testAccepted() {
         FakeState cand = new FakeState(1.9);
-        assertTrue(accept.test(null, best, curr, cand));
+        assertTrue(accept.isAccept(null, best, curr, cand));
     }
 
     @Test
     void testRejected() {
         FakeState cand = new FakeState(2.9);
-        assertFalse(accept.test(null, best, curr, cand));
+        assertFalse(accept.isAccept(null, best, curr, cand));
     }
 }
