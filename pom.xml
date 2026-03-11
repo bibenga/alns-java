@@ -7,7 +7,6 @@
     <artifactId>alns</artifactId>
     <version>${alns.version}</version>
     <packaging>jar</packaging>
-
     <url>https://github.com/bibenga/alns-java</url>
 
     <properties>
@@ -15,8 +14,29 @@
         <java.version>25</java.version>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
-        <alns.version>0.0.0-SNAPSHOT</alns.version>
+        <alns.version>0.1.0</alns.version>
     </properties>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://raw.githubusercontent.com/bibenga/alns-java/refs/heads/main/LICENSE</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>bibenga</name>
+            <email>13942981+bibenga@users.noreply.github.com</email>
+            <url>https://github.com/bibenga</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/bibenga/alns-java.git</connection>
+        <developerConnection>scm:git:ssh://github.com:bibenga/alns-java.git</developerConnection>
+        <url>https://github.com/bibenga/alns-java</url>
+    </scm>
 
     <dependencyManagement>
 		<dependencies>
