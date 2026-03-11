@@ -1,6 +1,7 @@
 package com.github.bibenga.alns.select;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.random.RandomGenerator;
 
 import com.github.bibenga.alns.Outcome;
@@ -8,44 +9,45 @@ import com.github.bibenga.alns.State;
 
 public class RouletteWheel extends AbstractOperatorSelectionScheme {
 
-    private final double[] scores;
+    private final Map<Outcome, Double> scores;
     private final double[] dWeights;
     private final double[] rWeights;
     private final double decay;
 
     public RouletteWheel(
-            double[] scores,
+            Map<Outcome, Double> scores,
             double decay,
             int numDestroy,
             int numRepair,
             boolean[][] opCoupling) {
         super(numDestroy, numRepair, opCoupling);
 
-        for (double s : scores) {
-            if (s < 0)
-                throw new IllegalArgumentException("Negative scores are not understood.");
-        }
-        if (scores.length < 4) {
+        if (scores.size() < 4) {
             throw new IllegalArgumentException(
-                    "Expected four scores, found %d".formatted(scores.length));
+                    "Expected four scores, found %d".formatted(scores.size()));
+        }
+        for (double s : scores.values()) {
+            if (s < 0)
+                throw new IllegalArgumentException("Negative scores are not understood");
         }
         if (decay < 0 || decay > 1) {
-            throw new IllegalArgumentException("decay outside [0, 1] not understood.");
+            throw new IllegalArgumentException("Decay outside [0, 1] not understood");
         }
 
         this.scores = scores;
-        this.decay = decay;
         this.dWeights = new double[numDestroy];
         this.rWeights = new double[numRepair];
+        this.decay = decay;
+
         Arrays.fill(dWeights, 1.0);
         Arrays.fill(rWeights, 1.0);
     }
 
-    public RouletteWheel(double[] scores, double decay, int numDestroy, int numRepair) {
+    public RouletteWheel(Map<Outcome, Double> scores, double decay, int numDestroy, int numRepair) {
         this(scores, decay, numDestroy, numRepair, null);
     }
 
-    public double[] getScores() {
+    public Map<Outcome, Double> getScores() {
         return scores;
     }
 
@@ -62,16 +64,17 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
     }
 
     @Override
-    public SelectedOperator select(RandomGenerator rng, State best, State curr) {
+    public SelectedOperator select(RandomGenerator rng, State best, State current) {
         if (hasOpCoupling()) {
             int dIdx = weightedChoice(rng, dWeights);
 
-            int[] coupledR = coupledRepairIndices(opCoupling[dIdx]);
-            double[] coupledRWeights = new double[coupledR.length];
-            for (int i = 0; i < coupledR.length; i++) {
-                coupledRWeights[i] = rWeights[coupledR[i]];
+            // TODO: cache coupledR and coupledRWeights on object level
+            int[] coupledRIdcs = getCoupledRepairIndices(opCoupling[dIdx]);
+            double[] coupledRWeights = new double[coupledRIdcs.length];
+            for (int i = 0; i < coupledRIdcs.length; i++) {
+                coupledRWeights[i] = rWeights[coupledRIdcs[i]];
             }
-            int rIdx = coupledR[weightedChoice(rng, coupledRWeights)];
+            int rIdx = coupledRIdcs[weightedChoice(rng, coupledRWeights)];
 
             return new SelectedOperator(dIdx, rIdx);
         } else {
@@ -83,7 +86,7 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
 
     @Override
     public void update(State candidate, SelectedOperator op, Outcome outcome) {
-        double score = scores[outcome.getValue()];
+        double score = scores.get(outcome);
         var dIdx = op.dIdx();
         var rIdx = op.rIdx();
         dWeights[dIdx] = decay * dWeights[dIdx] + (1 - decay) * score;
@@ -91,7 +94,7 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
     }
 
     private static int weightedChoice(RandomGenerator rng, double[] weights) {
-        double total = Arrays.stream(weights).sum();
+        double total = getTotal(weights);
         double r = rng.nextDouble() * total;
         double cumulative = 0;
         for (int i = 0; i < weights.length; i++) {
@@ -102,12 +105,20 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
         return weights.length - 1; // fallback for floating-point edge cases
     }
 
-    private static int[] coupledRepairIndices(boolean[] couplingRow) {
+    private static double getTotal(double[] weights) {
+        // return Arrays.stream(weights).sum();
+        double total = 0.0;
+        for (double w : weights) {
+            total += w;
+        }
+        return total;
+    }
+
+    private static int[] getCoupledRepairIndices(boolean[] couplingRow) {
         int count = 0;
         for (boolean b : couplingRow) {
-            if (b) {
+            if (b)
                 count++;
-            }
         }
         int[] indices = new int[count];
         int k = 0;

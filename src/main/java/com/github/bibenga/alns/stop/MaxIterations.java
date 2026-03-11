@@ -19,7 +19,11 @@ public class MaxIterations implements StoppingCriterion {
         return maxIterations;
     }
 
-    public boolean test(RandomGenerator rng, State best, State current) {
+    public int getCurrentIteration() {
+        return currentIteration;
+    }
+
+    public boolean isDone(RandomGenerator rng, State best, State current) {
         currentIteration++;
         return currentIteration > maxIterations;
     }

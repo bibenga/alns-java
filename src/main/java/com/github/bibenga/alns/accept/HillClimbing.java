@@ -7,7 +7,7 @@ import com.github.bibenga.alns.State;
 public class HillClimbing implements AcceptanceCriterion {
 
     @Override
-    public boolean test(RandomGenerator rng, State best, State current, State candidate) {
+    public boolean isAccept(RandomGenerator rng, State best, State current, State candidate) {
         return candidate.objective() <= current.objective();
     }
 }

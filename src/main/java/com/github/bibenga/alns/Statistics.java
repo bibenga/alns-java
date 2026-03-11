@@ -2,7 +2,7 @@ package com.github.bibenga.alns;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,53 +10,83 @@ import java.util.Map;
 
 public class Statistics {
 
-    private final List<Double> objectives = new ArrayList<>();
-    private final List<Long> runtimes = new ArrayList<>();
+    private Duration totalRuntime;
+    private final ArrayList<Double> objectives = new ArrayList<>(16);
+    private final ArrayList<Long> runtimes = new ArrayList<>(16);
     private final Map<Integer, EnumMap<Outcome, Integer>> destroyOperatorCounts = new LinkedHashMap<>();
     private final Map<Integer, EnumMap<Outcome, Integer>> repairOperatorCounts = new LinkedHashMap<>();
+
+    public Statistics() {
+    }
+
+    public Statistics(int numIterations, int numDestroy, int numRepair) {
+        if (numIterations > 0) {
+            objectives.ensureCapacity(numIterations + 1);
+            runtimes.ensureCapacity(numIterations + 1);
+        }
+        for (int i = 0; i < numDestroy; i++) {
+            destroyOperatorCounts.put(i, newCounter());
+        }
+        for (int i = 0; i < numRepair; i++) {
+            repairOperatorCounts.put(i, newCounter());
+        }
+    }
 
     public int getIterationCount() {
         return objectives.size() - 1;
     }
 
-    public Collection<Double> getObjectives() {
-        return objectives;
+    public List<Double> getObjectives() {
+        return Collections.unmodifiableList(objectives);
     }
 
-    public Collection<Long> getRuntimes() {
-        return runtimes;
+    public List<Long> getRuntimes() {
+        return Collections.unmodifiableList(runtimes);
+    }
+
+    void setTotalRuntime(Duration totalRuntime) {
+        this.totalRuntime = totalRuntime;
     }
 
     public Duration getTotalRuntime() {
-        return Duration.ofNanos(runtimes.getLast() - runtimes.getFirst());
+        return totalRuntime;
     }
 
     public Map<Integer, EnumMap<Outcome, Integer>> getDestroyOperatorCounts() {
-        return destroyOperatorCounts;
+        // TODO: value is still modifible
+        return Collections.unmodifiableMap(destroyOperatorCounts);
     }
 
     public Map<Integer, EnumMap<Outcome, Integer>> getRepairOperatorCounts() {
-        return repairOperatorCounts;
+        // TODO: value is still modifible
+        return Collections.unmodifiableMap(repairOperatorCounts);
     }
 
-    public void collectObjective(double objective) {
+    void collectObjective(double objective) {
         objectives.add(objective);
     }
 
-    public void collectRuntime(long time) {
+    void collectRuntime(long time) {
         runtimes.add(time);
     }
 
-    public void collectDestroyOperator(int operatorId, Outcome outcome) {
+    void collectDestroyOperator(int oIdx, Outcome outcome) {
         destroyOperatorCounts
-                .computeIfAbsent(operatorId, k -> new EnumMap<>(Outcome.class))
+                .computeIfAbsent(oIdx, k -> newCounter())
                 .merge(outcome, 1, Integer::sum);
     }
 
-    public void collectRepairOperator(int operatorId, Outcome outcome) {
+    void collectRepairOperator(int oIdx, Outcome outcome) {
         repairOperatorCounts
-                .computeIfAbsent(operatorId, k -> new EnumMap<>(Outcome.class))
+                .computeIfAbsent(oIdx, k -> newCounter())
                 .merge(outcome, 1, Integer::sum);
     }
 
+    private EnumMap<Outcome, Integer> newCounter() {
+        var c = new EnumMap<Outcome, Integer>(Outcome.class);
+        for (var o : Outcome.values()) {
+            c.put(o, 0);
+        }
+        return c;
+    }
 }

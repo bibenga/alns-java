@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +15,10 @@ import java.util.stream.IntStream;
 
 import com.github.bibenga.alns.ALNS;
 import com.github.bibenga.alns.Operator;
-import com.github.bibenga.alns.Outcome;
 import com.github.bibenga.alns.State;
 import com.github.bibenga.alns.accept.HillClimbing;
 import com.github.bibenga.alns.select.RouletteWheel;
+import com.github.bibenga.alns.select.Scores;
 import com.github.bibenga.alns.stop.MaxIterations;
 
 public class Tsp {
@@ -43,14 +42,8 @@ public class Tsp {
         Operator[] destroyOperators = { Tsp::randomRemoval, Tsp::pathRemoval, Tsp::worstRemoval };
         Operator[] repairOperators = { Tsp::greedyRepair };
 
-        // var scores = new EnumMap<Outcome, Double>(Outcome.class);
-        // scores.put(Outcome.BEST, 3.0);
-        // scores.put(Outcome.BETTER, 2.0);
-        // scores.put(Outcome.ACCEPT, 1.0);
-        // scores.put(Outcome.REJECT, 0.5);
-
         RouletteWheel sel = new RouletteWheel(
-                new double[] { 3, 2, 1, 0.5 },
+                Scores.of(3.0, 2.0, 1.0, 0.5),
                 0.8,
                 destroyOperators.length,
                 repairOperators.length,
@@ -58,14 +51,15 @@ public class Tsp {
         HillClimbing accept = new HillClimbing();
         MaxIterations stop = new MaxIterations(2000);
 
-        ALNS alns = new ALNS(rng);
+        ALNS solver = new ALNS(rng);
+        solver.setCollectObjectives(true);
         for (int i = 0; i < destroyOperators.length; i++) {
-            alns.addDestroyOperator(destroyNames[i], destroyOperators[i]);
+            solver.addDestroyOperator(destroyNames[i], destroyOperators[i]);
         }
         for (int i = 0; i < repairOperators.length; i++) {
-            alns.addRepairOperator(repairNames[i], repairOperators[i]);
+            solver.addRepairOperator(repairNames[i], repairOperators[i]);
         }
-        var result = alns.iterate(initSol, sel, accept, stop);
+        var result = solver.iterate(initSol, sel, accept, stop);
 
         var stat = result.statistics();
         TspState best = (TspState) result.bestState();
