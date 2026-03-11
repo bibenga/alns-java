@@ -3,15 +3,18 @@ package com.github.bibenga.alns.tsp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.collections.api.map.primitive.MutableIntIntMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
+
 import com.github.bibenga.alns.State;
 
 class TspState implements State {
     final int[] nodes;
-    final Map<Integer, Integer> edges;
+    final MutableIntIntMap edges;
     final double[][] dists;
     private double objective = Double.NaN;
 
-    TspState(int[] nodes, Map<Integer, Integer> edges, double[][] dists) {
+    TspState(int[] nodes, MutableIntIntMap edges, double[][] dists) {
         this.nodes = nodes;
         this.edges = edges;
         this.dists = dists;
@@ -19,7 +22,7 @@ class TspState implements State {
 
     @Override
     public TspState clone() {
-        return new TspState(nodes, new HashMap<>(edges), dists);
+        return new TspState(nodes, new IntIntHashMap(edges), dists);
     }
 
     @Override

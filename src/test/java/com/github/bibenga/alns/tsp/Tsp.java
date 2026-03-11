@@ -6,14 +6,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
+
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 import com.github.bibenga.alns.ALNS;
 import com.github.bibenga.alns.Operator;
@@ -32,7 +32,7 @@ public class Tsp {
 
         Random rng = new Random(42);
 
-        TspState initSol = new TspState(nodes, new HashMap<>(), dists);
+        TspState initSol = new TspState(nodes, new IntIntHashMap(), dists);
         initSol = (TspState) greedyRepair(initSol, rng);
 
         System.out.println("optimal solution: 564");
@@ -246,7 +246,7 @@ public class Tsp {
         int removed = 0;
         while (removed < toRemove) {
             int node = destroyed.nodes[rng.nextInt(destroyed.nodes.length)];
-            if (destroyed.edges.remove(node) != null) {
+            if (destroyed.edges.removeKeyIfAbsent(node, -1) != -1) {
                 removed++;
             }
         }
@@ -283,7 +283,11 @@ public class Tsp {
     static State greedyRepair(State state, RandomGenerator rng) {
         TspState cur = (TspState) state;
 
-        Set<Integer> visited = new HashSet<>(cur.edges.values());
+        var visited = new IntHashSet();
+        for (var it = cur.edges.values().intIterator(); it.hasNext();) {
+            var v = it.next();
+            visited.add(v);
+        }
 
         int[] idx = IntStream.range(0, cur.nodes.length).toArray();
         shuffleArray(idx, rng);
@@ -332,8 +336,8 @@ public class Tsp {
 
     private static boolean wouldFormSubcycle(int fromNode, int toNode, TspState state) {
         for (int step = 1; step < state.nodes.length; step++) {
-            Integer next = state.edges.get(toNode);
-            if (next == null)
+            int next = state.edges.getIfAbsent(toNode, -1);
+            if (next == -1)
                 return false;
             toNode = next;
             if (fromNode == toNode && step != state.nodes.length - 1)
