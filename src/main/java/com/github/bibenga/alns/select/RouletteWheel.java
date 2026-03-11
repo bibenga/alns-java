@@ -22,22 +22,23 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
             boolean[][] opCoupling) {
         super(numDestroy, numRepair, opCoupling);
 
-        for (double s : scores.values()) {
-            if (s < 0)
-                throw new IllegalArgumentException("Negative scores are not understood");
-        }
         if (scores.size() < 4) {
             throw new IllegalArgumentException(
                     "Expected four scores, found %d".formatted(scores.size()));
         }
+        for (double s : scores.values()) {
+            if (s < 0)
+                throw new IllegalArgumentException("Negative scores are not understood");
+        }
         if (decay < 0 || decay > 1) {
-            throw new IllegalArgumentException("Decay outside [0, 1] not understood.");
+            throw new IllegalArgumentException("Decay outside [0, 1] not understood");
         }
 
         this.scores = scores;
-        this.decay = decay;
         this.dWeights = new double[numDestroy];
         this.rWeights = new double[numRepair];
+        this.decay = decay;
+
         Arrays.fill(dWeights, 1.0);
         Arrays.fill(rWeights, 1.0);
     }
