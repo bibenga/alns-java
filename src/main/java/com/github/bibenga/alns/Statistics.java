@@ -10,10 +10,26 @@ import java.util.Map;
 
 public class Statistics {
 
-    private final List<Double> objectives = new ArrayList<>();
-    private final List<Long> runtimes = new ArrayList<>();
+    private final ArrayList<Double> objectives = new ArrayList<>(16);
+    private final ArrayList<Long> runtimes = new ArrayList<>(16);
     private final Map<Integer, EnumMap<Outcome, Integer>> destroyOperatorCounts = new LinkedHashMap<>();
     private final Map<Integer, EnumMap<Outcome, Integer>> repairOperatorCounts = new LinkedHashMap<>();
+
+    public Statistics() {
+    }
+
+    public Statistics(int numIterations, int numDestroy, int numRepair) {
+        if (numIterations > 0) {
+            objectives.ensureCapacity(numIterations + 1);
+            runtimes.ensureCapacity(numIterations + 1);
+        }
+        for (int i = 0; i < numDestroy; i++) {
+            destroyOperatorCounts.put(i, newCounter());
+        }
+        for (int i = 0; i < numRepair; i++) {
+            repairOperatorCounts.put(i, newCounter());
+        }
+    }
 
     public int getIterationCount() {
         return objectives.size() - 1;

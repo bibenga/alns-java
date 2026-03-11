@@ -63,7 +63,7 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
     }
 
     @Override
-    public SelectedOperator select(RandomGenerator rng, State best, State curr) {
+    public SelectedOperator select(RandomGenerator rng, State best, State current) {
         if (hasOpCoupling()) {
             int dIdx = weightedChoice(rng, dWeights);
 
@@ -115,9 +115,8 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
     private static int[] coupledRepairIndices(boolean[] couplingRow) {
         int count = 0;
         for (boolean b : couplingRow) {
-            if (b) {
+            if (b)
                 count++;
-            }
         }
         int[] indices = new int[count];
         int k = 0;

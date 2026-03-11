@@ -22,7 +22,7 @@ public class AbstractOperatorSelectionSchemeTest {
     void testNegativeDestroyCount() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> new DummyOperatorSelection(-2, 3, null));
-        assertEquals("Missing destroy or repair operators.", ex.getMessage());
+        assertEquals("Missing destroy or repair operators", ex.getMessage());
     }
 
     @Test
@@ -49,7 +49,7 @@ public class AbstractOperatorSelectionSchemeTest {
     @Test
     void testMissedCoupling() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> new DummyOperatorSelection(2, 3,
+                () -> new DummyOperatorSelection(2, 2,
                         new boolean[][] { { true, true }, { true } }));
         assertEquals("The number of columns in a row 1 does not match the expected 2",
                 ex.getMessage());
