@@ -68,12 +68,13 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
         if (hasOpCoupling()) {
             int dIdx = weightedChoice(rng, dWeights);
 
-            int[] coupledR = coupledRepairIndices(opCoupling[dIdx]);
-            double[] coupledRWeights = new double[coupledR.length];
-            for (int i = 0; i < coupledR.length; i++) {
-                coupledRWeights[i] = rWeights[coupledR[i]];
+            // TODO: cache coupledR and coupledRWeights on object level
+            int[] coupledRIdcs = getCoupledRepairIndices(opCoupling[dIdx]);
+            double[] coupledRWeights = new double[coupledRIdcs.length];
+            for (int i = 0; i < coupledRIdcs.length; i++) {
+                coupledRWeights[i] = rWeights[coupledRIdcs[i]];
             }
-            int rIdx = coupledR[weightedChoice(rng, coupledRWeights)];
+            int rIdx = coupledRIdcs[weightedChoice(rng, coupledRWeights)];
 
             return new SelectedOperator(dIdx, rIdx);
         } else {
@@ -113,7 +114,7 @@ public class RouletteWheel extends AbstractOperatorSelectionScheme {
         return total;
     }
 
-    private static int[] coupledRepairIndices(boolean[] couplingRow) {
+    private static int[] getCoupledRepairIndices(boolean[] couplingRow) {
         int count = 0;
         for (boolean b : couplingRow) {
             if (b)
