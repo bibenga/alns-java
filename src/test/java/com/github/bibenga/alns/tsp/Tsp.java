@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 
@@ -281,9 +283,9 @@ public class Tsp {
     static State greedyRepair(State state, RandomGenerator rng) {
         TspState cur = (TspState) state;
 
-        boolean[] visited = new boolean[cur.nodes.length];
+        Set<Integer> visited = new HashSet<>();
         for (int v : cur.edges.values())
-            visited[v] = true;
+            visited.add(v);
 
         int[] idx = IntStream.range(0, cur.nodes.length).toArray();
         shuffleArray(idx, rng);
@@ -305,7 +307,7 @@ public class Tsp {
             final int finalNode = node;
             List<Integer> unvisited = new ArrayList<>();
             for (int other : cur.nodes) {
-                if (other != finalNode && !visited[other] && !wouldFormSubcycle(finalNode, other, cur))
+                if (other != finalNode && !visited.contains(other) && !wouldFormSubcycle(finalNode, other, cur))
                     unvisited.add(other);
             }
             if (unvisited.isEmpty())
@@ -316,7 +318,7 @@ public class Tsp {
                     .orElseThrow();
 
             cur.edges.put(node, nearest);
-            visited[nearest] = true;
+            visited.add(nearest);
         }
         return cur;
     }
