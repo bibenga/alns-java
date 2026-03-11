@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +15,10 @@ import java.util.stream.IntStream;
 
 import com.github.bibenga.alns.ALNS;
 import com.github.bibenga.alns.Operator;
-import com.github.bibenga.alns.Outcome;
 import com.github.bibenga.alns.State;
 import com.github.bibenga.alns.accept.HillClimbing;
 import com.github.bibenga.alns.select.RouletteWheel;
+import com.github.bibenga.alns.select.Scores;
 import com.github.bibenga.alns.stop.MaxIterations;
 
 public class Tsp {
@@ -44,11 +43,7 @@ public class Tsp {
         Operator[] repairOperators = { Tsp::greedyRepair };
 
         RouletteWheel sel = new RouletteWheel(
-                new EnumMap<>(Map.of(
-                        Outcome.BEST, 3.0,
-                        Outcome.BETTER, 2.0,
-                        Outcome.ACCEPT, 1.0,
-                        Outcome.REJECT, 0.5)),
+                Scores.of(3.0, 2.0, 1.0, 0.5),
                 0.8,
                 destroyOperators.length,
                 repairOperators.length,
