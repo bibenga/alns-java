@@ -283,9 +283,7 @@ public class Tsp {
     static State greedyRepair(State state, RandomGenerator rng) {
         TspState cur = (TspState) state;
 
-        Set<Integer> visited = new HashSet<>();
-        for (int v : cur.edges.values())
-            visited.add(v);
+        Set<Integer> visited = new HashSet<>(cur.edges.values());
 
         int[] idx = IntStream.range(0, cur.nodes.length).toArray();
         shuffleArray(idx, rng);
