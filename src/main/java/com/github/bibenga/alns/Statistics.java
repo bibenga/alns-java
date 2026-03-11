@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class Statistics {
 
+    private Duration totalRuntime;
     private final ArrayList<Double> objectives = new ArrayList<>(16);
     private final ArrayList<Long> runtimes = new ArrayList<>(16);
     private final Map<Integer, EnumMap<Outcome, Integer>> destroyOperatorCounts = new LinkedHashMap<>();
@@ -43,8 +44,12 @@ public class Statistics {
         return Collections.unmodifiableList(runtimes);
     }
 
+    void setTotalRuntime(Duration totalRuntime) {
+        this.totalRuntime = totalRuntime;
+    }
+
     public Duration getTotalRuntime() {
-        return Duration.ofNanos(runtimes.getLast() - runtimes.getFirst());
+        return totalRuntime;
     }
 
     public Map<Integer, EnumMap<Outcome, Integer>> getDestroyOperatorCounts() {

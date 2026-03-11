@@ -56,14 +56,15 @@ public class Tsp {
         HillClimbing accept = new HillClimbing();
         MaxIterations stop = new MaxIterations(2000);
 
-        ALNS alns = new ALNS(rng);
+        ALNS solver = new ALNS(rng);
+        solver.setCollectObjectives(true);
         for (int i = 0; i < destroyOperators.length; i++) {
-            alns.addDestroyOperator(destroyNames[i], destroyOperators[i]);
+            solver.addDestroyOperator(destroyNames[i], destroyOperators[i]);
         }
         for (int i = 0; i < repairOperators.length; i++) {
-            alns.addRepairOperator(repairNames[i], repairOperators[i]);
+            solver.addRepairOperator(repairNames[i], repairOperators[i]);
         }
-        var result = alns.iterate(initSol, sel, accept, stop);
+        var result = solver.iterate(initSol, sel, accept, stop);
 
         var stat = result.statistics();
         TspState best = (TspState) result.bestState();
