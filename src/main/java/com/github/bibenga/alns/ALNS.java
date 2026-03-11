@@ -41,17 +41,17 @@ public class ALNS {
     }
 
     public Result iterate(
-            State initialSolution,
+            State initSol,
             OperatorSelectionScheme select,
             AcceptanceCriterion accept,
             StoppingCriterion stop) {
         if (dOps.isEmpty() || rOps.isEmpty()) {
-            throw new IllegalArgumentException("Missing destroy or repair operators.");
+            throw new IllegalArgumentException("Missing destroy or repair operators");
         }
 
-        State curr = initialSolution;
-        State best = initialSolution;
-        double initObj = initialSolution.objective();
+        State curr = initSol;
+        State best = initSol;
+        double initObj = initSol.objective();
 
         // logger.fine("Initial solution has objective %.2f.".formatted(initObj));
 
@@ -60,9 +60,9 @@ public class ALNS {
         stats.collectRuntime(System.nanoTime());
 
         while (!stop.test(rng, best, curr)) {
-            var selected = select.select(rng, best, curr);
-            var dIdx = selected.dIdx();
-            var rIdx = selected.rIdx();
+            var op = select.select(rng, best, curr);
+            var dIdx = op.dIdx();
+            var rIdx = op.rIdx();
 
             var dOp = dOps.get(dIdx);
             var rOp = rOps.get(rIdx);
@@ -97,7 +97,7 @@ public class ALNS {
             // }
             // // --- end inlined evalCand ---
 
-            select.update(cand, selected, outcome);
+            select.update(cand, op, outcome);
 
             stats.collectObjective(curr.objective());
             stats.collectDestroyOperator(dIdx, outcome);
