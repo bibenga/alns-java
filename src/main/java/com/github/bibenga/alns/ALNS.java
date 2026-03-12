@@ -1,6 +1,5 @@
 package com.github.bibenga.alns;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.random.RandomGenerator;
@@ -64,7 +63,7 @@ public class ALNS {
         var stats = new Statistics();
         if (collectObjectives) {
             stats.collectObjective(initObj);
-            stats.collectRuntime(System.nanoTime());
+            stats.collectRuntime(0);
         }
 
         long started = System.nanoTime();
@@ -112,10 +111,10 @@ public class ALNS {
             stats.collectRepairOperator(rIdx, outcome);
             if (collectObjectives) {
                 stats.collectObjective(curr.objective());
-                stats.collectRuntime(System.nanoTime());
+                stats.collectRuntime(System.nanoTime() - started);
             }
         }
-        stats.setTotalRuntime(Duration.ofNanos(System.nanoTime() - started));
+        stats.setTotalRuntime(System.nanoTime() - started);
 
         // logger.info("Finished iterating in %.2fs.".formatted(stats.getTotalRuntime()));
 

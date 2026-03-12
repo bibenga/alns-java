@@ -44,8 +44,8 @@ public class Statistics {
         return Collections.unmodifiableList(runtimes);
     }
 
-    void setTotalRuntime(Duration totalRuntime) {
-        this.totalRuntime = totalRuntime;
+    void setTotalRuntime(long totalRuntime) {
+        this.totalRuntime = Duration.ofNanos(totalRuntime);
     }
 
     public Duration getTotalRuntime() {
