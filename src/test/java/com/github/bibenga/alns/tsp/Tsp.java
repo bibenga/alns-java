@@ -238,7 +238,7 @@ public class Tsp {
         return n == 0 ? 1 : n;
     }
 
-    public static State randomRemoval(State state, RandomGenerator rng) {
+    private static State randomRemoval(State state, RandomGenerator rng) {
         TspState destroyed = ((TspState) state).clone();
         int toRemove = edgesToRemove(destroyed);
         int removed = 0;
@@ -251,7 +251,7 @@ public class Tsp {
         return destroyed;
     }
 
-    public static State pathRemoval(State state, RandomGenerator rng) {
+    private static State pathRemoval(State state, RandomGenerator rng) {
         TspState destroyed = ((TspState) state).clone();
         int node = destroyed.nodes[rng.nextInt(destroyed.nodes.length)];
         int toRemove = edgesToRemove(destroyed);
@@ -263,7 +263,7 @@ public class Tsp {
         return destroyed;
     }
 
-    public static State worstRemoval(State state, RandomGenerator rng) {
+    private static State worstRemoval(State state, RandomGenerator rng) {
         var destroyed = ((TspState) state).clone();
         int[] worstEdges = destroyed.nodes.clone();
         // sort ascending by edge distance so we can remove from the end
@@ -278,7 +278,7 @@ public class Tsp {
         return destroyed;
     }
 
-    static State greedyRepair(State state, RandomGenerator rng) {
+    private static State greedyRepair(State state, RandomGenerator rng) {
         TspState cur = (TspState) state;
 
         boolean[] visited = new boolean[cur.nodes.length];
