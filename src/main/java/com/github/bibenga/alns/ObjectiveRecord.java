@@ -8,7 +8,7 @@ import java.time.Duration;
  * @param time      the timestamp in nanoseconds
  * @param objective the measured objective value at the given time
  */
-public record ObjectiveData(long time, double objective) {
+public record ObjectiveRecord(long time, double objective) {
     /**
      * Converts the nanosecond timestamp to a {@link Duration}.
      *

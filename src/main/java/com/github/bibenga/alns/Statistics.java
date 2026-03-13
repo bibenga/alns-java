@@ -14,7 +14,7 @@ public class Statistics {
     private final List<OperatorInfo> rOps;
     private Duration totalRuntime;
     private int iterationCount;
-    private final List<ObjectiveData> objectives = new ArrayList<>();
+    private final List<ObjectiveRecord> objectives = new ArrayList<>();
     private final List<EnumMap<Outcome, Integer>> dOpsCounts;
     private final List<EnumMap<Outcome, Integer>> rOpsCounts;
 
@@ -47,7 +47,7 @@ public class Statistics {
         return totalRuntime;
     }
 
-    public List<ObjectiveData> getObjectives() {
+    public List<ObjectiveRecord> getObjectives() {
         if (objectives == null) {
             return Collections.emptyList();
         }
@@ -74,7 +74,7 @@ public class Statistics {
     }
 
     void collectObjective(long time, double objective) {
-        objectives.add(new ObjectiveData(time, objective));
+        objectives.add(new ObjectiveRecord(time, objective));
     }
 
     void collectDestroyOperator(int oIdx, Outcome outcome) {
