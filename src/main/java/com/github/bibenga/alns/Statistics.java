@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.bibenga.alns.select.SelectedOperator;
+
 public class Statistics {
 
     private final List<OperatorInfo> dOps;
@@ -33,10 +35,6 @@ public class Statistics {
 
     public int getIterationCount() {
         return iterationCount;
-    }
-
-    void incIterationCount() {
-        iterationCount++;
     }
 
     void setTotalRuntime(long totalRuntime) {
@@ -77,12 +75,10 @@ public class Statistics {
         objectives.add(new ObjectiveRecord(time, objective));
     }
 
-    void collectDestroyOperator(int oIdx, Outcome outcome) {
-        dOpsCounts.get(oIdx).merge(outcome, 1, Integer::sum);
-    }
-
-    void collectRepairOperator(int oIdx, Outcome outcome) {
-        rOpsCounts.get(oIdx).merge(outcome, 1, Integer::sum);
+    void collect(SelectedOperator op, Outcome outcome) {
+        iterationCount++;
+        dOpsCounts.get(op.dIdx()).merge(outcome, 1, Integer::sum);
+        rOpsCounts.get(op.rIdx()).merge(outcome, 1, Integer::sum);
     }
 
     private static EnumMap<Outcome, Integer> newCounter() {
@@ -92,4 +88,5 @@ public class Statistics {
         }
         return c;
     }
+
 }

@@ -98,10 +98,8 @@ public class ALNS {
 
             var dOp = dOps.get(dIdx);
             var rOp = rOps.get(rIdx);
-            // String dName = dEntry.getKey();
-            // String rName = rEntry.getKey();
 
-            // logger.fine("Selected operators %s and %s.".formatted(dName, rName));
+            // logger.fine("Selected operators %s and %s.".formatted(dOp.name(), rOp.name()));
 
             State destroyed = dOp.operator().apply(curr, rng);
             State cand = rOp.operator().apply(destroyed, rng);
@@ -131,12 +129,10 @@ public class ALNS {
 
             select.update(cand, op, outcome);
 
-            stats.collectDestroyOperator(dIdx, outcome);
-            stats.collectRepairOperator(rIdx, outcome);
+            stats.collect(op, outcome);
             if (collectObjectives) {
                 stats.collectObjective(System.nanoTime() - started, curr.objective());
             }
-            stats.incIterationCount();
         }
         stats.setTotalRuntime(System.nanoTime() - started);
 
