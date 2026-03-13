@@ -17,8 +17,8 @@ public class Statistics {
     private Duration totalRuntime;
     private int iterationCount;
     private final List<ObjectiveRecord> objectives = new ArrayList<>();
-    private final List<EnumMap<Outcome, Integer>> dOpsCounts;
-    private final List<EnumMap<Outcome, Integer>> rOpsCounts;
+    private final List<Map<Outcome, Integer>> dOpsCounts;
+    private final List<Map<Outcome, Integer>> rOpsCounts;
 
     Statistics(List<OperatorInfo> dOps, List<OperatorInfo> rOps) {
         this.dOps = dOps;
@@ -60,8 +60,9 @@ public class Statistics {
         return makeCountsMap(rOps, rOpsCounts);
     }
 
-    private static Map<String, Map<Outcome, Integer>> makeCountsMap(List<OperatorInfo> ops,
-            List<EnumMap<Outcome, Integer>> opsCounts) {
+    private static Map<String, Map<Outcome, Integer>> makeCountsMap(
+            List<OperatorInfo> ops,
+            List<Map<Outcome, Integer>> opsCounts) {
         Map<String, Map<Outcome, Integer>> res = new LinkedHashMap<>();
         for (int i = 0; i < ops.size(); i++) {
             var name = ops.get(i).name();
@@ -81,7 +82,7 @@ public class Statistics {
         rOpsCounts.get(op.rIdx()).merge(outcome, 1, Integer::sum);
     }
 
-    private static EnumMap<Outcome, Integer> newCounter() {
+    private static Map<Outcome, Integer> newCounter() {
         var c = new EnumMap<Outcome, Integer>(Outcome.class);
         for (var o : Outcome.values()) {
             c.put(o, 0);
