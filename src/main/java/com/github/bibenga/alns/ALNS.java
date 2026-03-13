@@ -56,8 +56,8 @@ public class ALNS {
 
     private static void validateOpName(String name, List<OperatorInfo> ops) {
         for (var oi : ops) {
-            if (oi.name() == name) {
-                throw new IllegalArgumentException("The name %s is already registred".formatted(name));
+            if (oi.name().equals(name)) {
+                throw new IllegalArgumentException("Name %s has already been registered".formatted(name));
             }
         }
     }
@@ -87,8 +87,7 @@ public class ALNS {
 
         var stats = new Statistics(dOps, rOps);
         if (collectObjectives) {
-            stats.collectObjective(initObj);
-            stats.collectRuntime(0);
+            stats.collectObjective(0, initObj);
         }
 
         long started = System.nanoTime();
@@ -135,9 +134,9 @@ public class ALNS {
             stats.collectDestroyOperator(dIdx, outcome);
             stats.collectRepairOperator(rIdx, outcome);
             if (collectObjectives) {
-                stats.collectObjective(curr.objective());
-                stats.collectRuntime(System.nanoTime() - started);
+                stats.collectObjective(System.nanoTime() - started, curr.objective());
             }
+            stats.incIterationCount();
         }
         stats.setTotalRuntime(System.nanoTime() - started);
 

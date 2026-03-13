@@ -71,11 +71,12 @@ public class Tsp {
         if (solver.isCollectObjectives()) {
             System.out.println("objectives");
             var objectives = stats.getObjectives();
-            var runtimes = stats.getRuntimes();
             for (var i = 0; i < objectives.size(); i++) {
-                System.out.printf("    %.6f: %.2f%n",
-                        runtimes.get(i).toNanos() / 1_000_000_000.0,
-                        objectives.get(i));
+                var o = objectives.get(i);
+                System.out.printf("   %4d: %.6f - %.2f%n",
+                        i,
+                        o.time() / 1_000_000_000.0,
+                        o.objective());
             }
         }
 

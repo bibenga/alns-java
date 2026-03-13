@@ -13,8 +13,8 @@ public class Statistics {
     private final List<OperatorInfo> dOps;
     private final List<OperatorInfo> rOps;
     private Duration totalRuntime;
-    private final List<Double> objectives = new ArrayList<>();
-    private final List<Long> runtimes = new ArrayList<>();
+    private int iterationCount;
+    private final List<ObjectiveData> objectives = new ArrayList<>();
     private final List<EnumMap<Outcome, Integer>> dOpsCounts;
     private final List<EnumMap<Outcome, Integer>> rOpsCounts;
 
@@ -32,28 +32,11 @@ public class Statistics {
     }
 
     public int getIterationCount() {
-        if (objectives == null) {
-            return 0;
-        }
-        return objectives.size() - 1;
+        return iterationCount;
     }
 
-    public List<Double> getObjectives() {
-        if (objectives == null) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(objectives);
-    }
-
-    public List<Duration> getRuntimes() {
-        if (objectives == null) {
-            return Collections.emptyList();
-        }
-        var runtimes = new ArrayList<Duration>(this.runtimes.size());
-        for (var d : this.runtimes) {
-            runtimes.add(Duration.ofNanos(d));
-        }
-        return Collections.unmodifiableList(runtimes);
+    void incIterationCount() {
+        iterationCount++;
     }
 
     void setTotalRuntime(long totalRuntime) {
@@ -62,6 +45,13 @@ public class Statistics {
 
     public Duration getTotalRuntime() {
         return totalRuntime;
+    }
+
+    public List<ObjectiveData> getObjectives() {
+        if (objectives == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(objectives);
     }
 
     public Map<String, Map<Outcome, Integer>> getDestroyOperatorCounts() {
@@ -83,12 +73,8 @@ public class Statistics {
         return Collections.unmodifiableMap(res);
     }
 
-    void collectObjective(double objective) {
-        objectives.add(objective);
-    }
-
-    void collectRuntime(long time) {
-        runtimes.add(time);
+    void collectObjective(long time, double objective) {
+        objectives.add(new ObjectiveData(time, objective));
     }
 
     void collectDestroyOperator(int oIdx, Outcome outcome) {
