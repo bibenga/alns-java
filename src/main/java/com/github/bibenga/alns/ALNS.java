@@ -10,8 +10,8 @@ import com.github.bibenga.alns.stop.StoppingCriterion;
 
 public class ALNS {
     private final RandomGenerator rng;
-    private final List<Operator> dOps = new ArrayList<>();
-    private final List<Operator> rOps = new ArrayList<>();
+    private final List<OperatorInfo> dOps = new ArrayList<>();
+    private final List<OperatorInfo> rOps = new ArrayList<>();
     private Callback onOutcome;
     private boolean collectObjectives;
 
@@ -23,26 +23,40 @@ public class ALNS {
         this(RandomGenerator.getDefault());
     }
 
-    public List<Operator> getDestroyOperators() {
+    public List<OperatorInfo> getDestroyOperators() {
         return dOps;
     }
 
-    public List<Operator> getRepairOperators() {
+    public List<OperatorInfo> getRepairOperators() {
         return rOps;
     }
 
     public void addDestroyOperator(String name, Operator operator) {
         // logger.fine("Adding destroy operator %s.".formatted(name));
-        dOps.add(operator);
+        validateName(name, dOps);
+        dOps.add(new OperatorInfo(name, operator));
     }
 
     public void addRepairOperator(String name, Operator operator) {
         // logger.fine("Adding repair operator %s.".formatted(name));
-        rOps.add(operator);
+        validateName(name, rOps);
+        rOps.add(new OperatorInfo(name, operator));
+    }
+
+    private static void validateName(String name, List<OperatorInfo> ops) {
+        for (var oi : ops) {
+            if (oi.name() == name) {
+                throw new IllegalArgumentException("The name %s is already registred".formatted(name));
+            }
+        }
     }
 
     public void setCollectObjectives(boolean collectObjectives) {
         this.collectObjectives = collectObjectives;
+    }
+
+    public boolean isCollectObjectives() {
+        return collectObjectives;
     }
 
     public Result iterate(
@@ -60,7 +74,7 @@ public class ALNS {
 
         // logger.fine("Initial solution has objective %.2f.".formatted(initObj));
 
-        var stats = new Statistics();
+        var stats = new Statistics(dOps, rOps);
         if (collectObjectives) {
             stats.collectObjective(initObj);
             stats.collectRuntime(0);
@@ -79,8 +93,8 @@ public class ALNS {
 
             // logger.fine("Selected operators %s and %s.".formatted(dName, rName));
 
-            State destroyed = dOp.apply(curr, rng);
-            State cand = rOp.apply(destroyed, rng);
+            State destroyed = dOp.operator().apply(curr, rng);
+            State cand = rOp.operator().apply(destroyed, rng);
 
             var evalResult = evalCand(accept, best, curr, cand);
             best = evalResult.best();
