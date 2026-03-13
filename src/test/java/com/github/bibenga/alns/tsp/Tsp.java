@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 
+import org.eclipse.collections.api.map.primitive.IntIntMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
@@ -350,7 +350,7 @@ public class Tsp {
         return false;
     }
 
-    static void writeDotFile(String filename, double[][] coords, Map<Integer, Integer> edges) throws IOException {
+    static void writeDotFile(String filename, double[][] coords, IntIntMap edges) throws IOException {
         final double k = 3;
         double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
         double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
@@ -371,8 +371,9 @@ public class Tsp {
                         "  %d [label=\"%d\", fontsize=48, pos=\"%f,%f!\", shape=circle, width=2, height=2, fixedsize=true];%n",
                         i, i, x, y);
             }
-            for (Map.Entry<Integer, Integer> e : edges.entrySet())
-                w.printf("  %d -> %d [arrowsize=4, penwidth=3];%n", e.getKey(), e.getValue());
+            edges.forEachKeyValue((key, value) -> {
+                w.printf("  %d -> %d [arrowsize=4, penwidth=3];%n", key, value);
+            });
             w.println("}");
         }
     }
