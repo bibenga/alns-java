@@ -15,17 +15,17 @@ public class Statistics {
     private Duration totalRuntime;
     private final List<Double> objectives = new ArrayList<>();
     private final List<Long> runtimes = new ArrayList<>();
-    private final ArrayList<EnumMap<Outcome, Integer>> dOpsCounts = new ArrayList<>();
-    private final ArrayList<EnumMap<Outcome, Integer>> rOpsCounts = new ArrayList<>();
+    private final List<EnumMap<Outcome, Integer>> dOpsCounts;
+    private final List<EnumMap<Outcome, Integer>> rOpsCounts;
 
     Statistics(List<OperatorInfo> dOps, List<OperatorInfo> rOps) {
         this.dOps = dOps;
         this.rOps = rOps;
-        dOpsCounts.ensureCapacity(dOps.size());
+        dOpsCounts = new ArrayList<>(dOps.size());
         for (int i = 0; i < dOps.size(); i++) {
             dOpsCounts.add(newCounter());
         }
-        rOpsCounts.ensureCapacity(rOps.size());
+        rOpsCounts = new ArrayList<>(dOps.size());
         for (int i = 0; i < rOps.size(); i++) {
             rOpsCounts.add(newCounter());
         }
