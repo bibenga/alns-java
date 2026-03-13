@@ -14,7 +14,6 @@ import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 
 import com.github.bibenga.alns.ALNS;
-import com.github.bibenga.alns.Operator;
 import com.github.bibenga.alns.State;
 import com.github.bibenga.alns.accept.HillClimbing;
 import com.github.bibenga.alns.select.RouletteWheel;
@@ -36,48 +35,53 @@ public class Tsp {
         System.out.println("optimal solution: 564");
         System.out.printf("initial solution: %.4f%n", initSol.objective());
 
-        String[] destroyNames = { "randomRemoval", "pathRemoval", "worstRemoval" };
-        String[] repairNames = { "greedyRepair" };
-
-        Operator[] destroyOperators = { Tsp::randomRemoval, Tsp::pathRemoval, Tsp::worstRemoval };
-        Operator[] repairOperators = { Tsp::greedyRepair };
-
         RouletteWheel sel = new RouletteWheel(
                 Scores.of(3.0, 2.0, 1.0, 0.5),
                 0.8,
-                destroyOperators.length,
-                repairOperators.length,
+                3,
+                1,
                 null);
         HillClimbing accept = new HillClimbing();
         MaxIterations stop = new MaxIterations(2000);
 
         ALNS solver = new ALNS(rng);
-        solver.setCollectObjectives(true);
-        for (int i = 0; i < destroyOperators.length; i++) {
-            solver.addDestroyOperator(destroyNames[i], destroyOperators[i]);
-        }
-        for (int i = 0; i < repairOperators.length; i++) {
-            solver.addRepairOperator(repairNames[i], repairOperators[i]);
-        }
+        solver.setCollectObjectives(false);
+        solver.addDestroyOperator("randomRemoval", Tsp::randomRemoval);
+        solver.addDestroyOperator("pathRemoval", Tsp::pathRemoval);
+        solver.addDestroyOperator("worstRemoval", Tsp::worstRemoval);
+        solver.addRepairOperator("greedyRepair", Tsp::greedyRepair);
         var result = solver.iterate(initSol, sel, accept, stop);
 
-        var stat = result.statistics();
+        var stats = result.statistics();
         TspState best = (TspState) result.bestState();
 
         System.out.printf("best solution: %.4f%n", best.objective());
-        System.out.printf("statistics: IterationCount=%d; TotalRuntime=%s%n",
-                stat.getIterationCount(),
-                stat.getTotalRuntime());
+        System.out.printf("statistics: IterationCount=%d; TotalRuntime=%.6fs%n",
+                stats.getIterationCount(),
+                stats.getTotalRuntime().toNanos() / 1_000_000_000.0);
         System.out.println("  destroy operators");
-        for (int i = 0; i < destroyNames.length; i++) {
-            System.out.printf("    %d: %14s; %s%n", i, destroyNames[i], stat.getDestroyOperatorCounts().get(i));
+        for (var e : stats.getDestroyOperatorCounts().entrySet()) {
+            System.out.printf("    %-14s: %s%n", e.getKey(), e.getValue());
         }
         System.out.println("  repair operators");
-        for (int i = 0; i < repairNames.length; i++) {
-            System.out.printf("    %d: %14s; %s%n", i, repairNames[i], stat.getRepairOperatorCounts().get(i));
+        for (var e : stats.getRepairOperatorCounts().entrySet()) {
+            System.out.printf("    %-14s: %s%n", e.getKey(), e.getValue());
         }
 
-        // writeDotFile("tsp.dot", COORDS, best.edges);
+        if (solver.isCollectObjectives()) {
+            System.out.println("objectives");
+            var objectives = stats.getObjectives();
+            for (var i = 0; i < objectives.size(); i++) {
+                var o = objectives.get(i);
+                System.out.printf("   %4d: %.6f - %.2f%n",
+                        i,
+                        o.time() / 1_000_000_000.0,
+                        o.objective());
+            }
+        }
+
+        // neato -Tpng tsp.dot -o tsp.png
+        writeDotFile("tsp.dot", COORDS, best.edges);
     }
 
     static final double[][] COORDS = {
