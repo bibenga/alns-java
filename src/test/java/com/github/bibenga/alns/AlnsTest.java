@@ -66,18 +66,18 @@ class AlnsTest {
         assertEquals(total + 1, res.statistics().getObjectives().size(),
                 "%d objectives expected, actual %d".formatted(total + 1, res.statistics().getObjectives().size()));
 
-        EnumMap<Outcome, Integer> repairOperatorCounts = new EnumMap<>(Map.of(
-                Outcome.BEST, bestCount[0],
-                Outcome.BETTER, 0,
-                Outcome.ACCEPT, 0,
-                Outcome.REJECT, total - bestCount[0]));
-        assertEquals(repairOperatorCounts, res.statistics().getDestroyOperatorCounts().get("destroyOp"));
-
         EnumMap<Outcome, Integer> destroyOperatorCounts = new EnumMap<>(Map.of(
                 Outcome.BEST, bestCount[0],
                 Outcome.BETTER, 0,
                 Outcome.ACCEPT, 0,
                 Outcome.REJECT, total - bestCount[0]));
-        assertEquals(destroyOperatorCounts, res.statistics().getDestroyOperatorCounts().get("repairOp"));
+        assertEquals(destroyOperatorCounts, res.statistics().getDestroyOperatorCounts().get("destroyOp"));
+
+        EnumMap<Outcome, Integer> repairOperatorCounts = new EnumMap<>(Map.of(
+                Outcome.BEST, bestCount[0],
+                Outcome.BETTER, 0,
+                Outcome.ACCEPT, 0,
+                Outcome.REJECT, total - bestCount[0]));
+        assertEquals(repairOperatorCounts, res.statistics().getRepairOperatorCounts().get("repairOp"));
     }
 }

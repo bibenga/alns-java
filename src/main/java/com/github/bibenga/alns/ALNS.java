@@ -1,7 +1,10 @@
 package com.github.bibenga.alns;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.random.RandomGenerator;
 
 import com.github.bibenga.alns.accept.AcceptanceCriterion;
@@ -13,7 +16,7 @@ public class ALNS {
     private final List<OperatorInfo> dOps = new ArrayList<>();
     private final List<OperatorInfo> rOps = new ArrayList<>();
     private Callback onOutcome;
-    private boolean collectObjectives;
+    private boolean collectObjectives = true;
 
     public ALNS(RandomGenerator rng) {
         this.rng = rng;
@@ -23,27 +26,35 @@ public class ALNS {
         this(RandomGenerator.getDefault());
     }
 
-    public List<OperatorInfo> getDestroyOperators() {
-        return dOps;
+    public Map<String, Operator> getDestroyOperators() {
+        return makeOperatorMap(dOps);
     }
 
-    public List<OperatorInfo> getRepairOperators() {
-        return rOps;
+    public Map<String, Operator> getRepairOperators() {
+        return makeOperatorMap(rOps);
+    }
+
+    private static Map<String, Operator> makeOperatorMap(List<OperatorInfo> ops) {
+        Map<String, Operator> res = new LinkedHashMap<>();
+        for (var op : ops) {
+            res.put(op.name(), op.operator());
+        }
+        return Collections.unmodifiableMap(res);
     }
 
     public void addDestroyOperator(String name, Operator operator) {
         // logger.fine("Adding destroy operator %s.".formatted(name));
-        validateName(name, dOps);
+        validateOpName(name, dOps);
         dOps.add(new OperatorInfo(name, operator));
     }
 
     public void addRepairOperator(String name, Operator operator) {
         // logger.fine("Adding repair operator %s.".formatted(name));
-        validateName(name, rOps);
+        validateOpName(name, rOps);
         rOps.add(new OperatorInfo(name, operator));
     }
 
-    private static void validateName(String name, List<OperatorInfo> ops) {
+    private static void validateOpName(String name, List<OperatorInfo> ops) {
         for (var oi : ops) {
             if (oi.name() == name) {
                 throw new IllegalArgumentException("The name %s is already registred".formatted(name));

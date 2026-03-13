@@ -78,13 +78,9 @@ public class Tsp {
                         objectives.get(i));
             }
         }
-        // fmt.Println("objectives")
-        // for i, objective := range stat.Objectives {
-        // 	elapsed := stat.Runtimes[i]
-        // 	fmt.Printf("%4d: %12s - %.4f\n", i, elapsed, objective)
-        // }
 
-        // writeDotFile("tsp.dot", COORDS, best.edges);
+        // neato -Tpng tsp.dot -o tsp.png
+        writeDotFile("tsp.dot", COORDS, best.edges);
     }
 
     static final double[][] COORDS = {
