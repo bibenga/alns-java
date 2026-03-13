@@ -8,85 +8,85 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.bibenga.alns.select.SelectedOperator;
+
 public class Statistics {
 
+    private final List<OperatorInfo> dOps;
+    private final List<OperatorInfo> rOps;
     private Duration totalRuntime;
-    private final ArrayList<Double> objectives = new ArrayList<>(16);
-    private final ArrayList<Long> runtimes = new ArrayList<>(16);
-    private final Map<Integer, EnumMap<Outcome, Integer>> destroyOperatorCounts = new LinkedHashMap<>();
-    private final Map<Integer, EnumMap<Outcome, Integer>> repairOperatorCounts = new LinkedHashMap<>();
+    private int iterationCount;
+    private final List<ObjectiveRecord> objectives = new ArrayList<>();
+    private final List<EnumMap<Outcome, Integer>> dOpsCounts;
+    private final List<EnumMap<Outcome, Integer>> rOpsCounts;
 
-    public Statistics() {
-    }
-
-    public Statistics(int numIterations, int numDestroy, int numRepair) {
-        if (numIterations > 0) {
-            objectives.ensureCapacity(numIterations + 1);
-            runtimes.ensureCapacity(numIterations + 1);
+    Statistics(List<OperatorInfo> dOps, List<OperatorInfo> rOps) {
+        this.dOps = dOps;
+        this.rOps = rOps;
+        dOpsCounts = new ArrayList<>(dOps.size());
+        for (int i = 0; i < dOps.size(); i++) {
+            dOpsCounts.add(newCounter());
         }
-        for (int i = 0; i < numDestroy; i++) {
-            destroyOperatorCounts.put(i, newCounter());
-        }
-        for (int i = 0; i < numRepair; i++) {
-            repairOperatorCounts.put(i, newCounter());
+        rOpsCounts = new ArrayList<>(dOps.size());
+        for (int i = 0; i < rOps.size(); i++) {
+            rOpsCounts.add(newCounter());
         }
     }
 
     public int getIterationCount() {
-        return objectives.size() - 1;
+        return iterationCount;
     }
 
-    public List<Double> getObjectives() {
-        return Collections.unmodifiableList(objectives);
-    }
-
-    public List<Long> getRuntimes() {
-        return Collections.unmodifiableList(runtimes);
-    }
-
-    void setTotalRuntime(Duration totalRuntime) {
-        this.totalRuntime = totalRuntime;
+    void setTotalRuntime(long totalRuntime) {
+        this.totalRuntime = Duration.ofNanos(totalRuntime);
     }
 
     public Duration getTotalRuntime() {
         return totalRuntime;
     }
 
-    public Map<Integer, EnumMap<Outcome, Integer>> getDestroyOperatorCounts() {
-        // TODO: value is still modifible
-        return Collections.unmodifiableMap(destroyOperatorCounts);
+    public List<ObjectiveRecord> getObjectives() {
+        if (objectives == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(objectives);
     }
 
-    public Map<Integer, EnumMap<Outcome, Integer>> getRepairOperatorCounts() {
-        // TODO: value is still modifible
-        return Collections.unmodifiableMap(repairOperatorCounts);
+    public Map<String, Map<Outcome, Integer>> getDestroyOperatorCounts() {
+        return makeCountsMap(dOps, dOpsCounts);
     }
 
-    void collectObjective(double objective) {
-        objectives.add(objective);
+    public Map<String, Map<Outcome, Integer>> getRepairOperatorCounts() {
+        return makeCountsMap(rOps, rOpsCounts);
     }
 
-    void collectRuntime(long time) {
-        runtimes.add(time);
+    private static Map<String, Map<Outcome, Integer>> makeCountsMap(List<OperatorInfo> ops,
+            List<EnumMap<Outcome, Integer>> opsCounts) {
+        Map<String, Map<Outcome, Integer>> res = new LinkedHashMap<>();
+        for (int i = 0; i < ops.size(); i++) {
+            var name = ops.get(i).name();
+            var counts = opsCounts.get(i);
+            res.put(name, Collections.unmodifiableMap(counts));
+        }
+        return Collections.unmodifiableMap(res);
     }
 
-    void collectDestroyOperator(int oIdx, Outcome outcome) {
-        destroyOperatorCounts
-                .computeIfAbsent(oIdx, k -> newCounter())
-                .merge(outcome, 1, Integer::sum);
+    void collectObjective(long time, double objective) {
+        objectives.add(new ObjectiveRecord(time, objective));
     }
 
-    void collectRepairOperator(int oIdx, Outcome outcome) {
-        repairOperatorCounts
-                .computeIfAbsent(oIdx, k -> newCounter())
-                .merge(outcome, 1, Integer::sum);
+    void collect(SelectedOperator op, Outcome outcome) {
+        iterationCount++;
+        dOpsCounts.get(op.dIdx()).merge(outcome, 1, Integer::sum);
+        rOpsCounts.get(op.rIdx()).merge(outcome, 1, Integer::sum);
     }
 
-    private EnumMap<Outcome, Integer> newCounter() {
+    private static EnumMap<Outcome, Integer> newCounter() {
         var c = new EnumMap<Outcome, Integer>(Outcome.class);
         for (var o : Outcome.values()) {
             c.put(o, 0);
         }
         return c;
     }
+
 }
