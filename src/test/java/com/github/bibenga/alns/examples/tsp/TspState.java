@@ -1,4 +1,4 @@
-package com.github.bibenga.alns.tsp;
+package com.github.bibenga.alns.examples.tsp;
 
 import java.util.HashMap;
 import java.util.Map;

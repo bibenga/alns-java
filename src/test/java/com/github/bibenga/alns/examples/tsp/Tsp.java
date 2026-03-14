@@ -1,4 +1,4 @@
-package com.github.bibenga.alns.tsp;
+package com.github.bibenga.alns.examples.tsp;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,6 +45,7 @@ public class Tsp {
         MaxIterations stop = new MaxIterations(2000);
 
         ALNS solver = new ALNS(rng);
+        // solver.setLog(Logger.getLogger(ALNS.class.getName()));
         solver.setCollectObjectives(false);
         solver.addDestroyOperator("randomRemoval", Tsp::randomRemoval);
         solver.addDestroyOperator("pathRemoval", Tsp::pathRemoval);

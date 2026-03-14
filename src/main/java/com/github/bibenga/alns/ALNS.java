@@ -1,10 +1,12 @@
 package com.github.bibenga.alns;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.random.RandomGenerator;
 
 import com.github.bibenga.alns.accept.AcceptanceCriterion;
@@ -12,6 +14,7 @@ import com.github.bibenga.alns.select.OperatorSelectionScheme;
 import com.github.bibenga.alns.stop.StoppingCriterion;
 
 public class ALNS {
+    private Logger log;
     private final RandomGenerator rng;
     private final List<OperatorInfo> dOps = new ArrayList<>();
     private final List<OperatorInfo> rOps = new ArrayList<>();
@@ -24,6 +27,10 @@ public class ALNS {
 
     public ALNS() {
         this(RandomGenerator.getDefault());
+    }
+
+    public void setLog(Logger logger) {
+        this.log = logger;
     }
 
     public Map<String, Operator> getDestroyOperators() {
@@ -83,7 +90,9 @@ public class ALNS {
         State best = initSol;
         double initObj = initSol.objective();
 
-        // logger.fine("Initial solution has objective %.2f.".formatted(initObj));
+        if (log != null) {
+            log.fine("Initial solution objective: %.2f".formatted(initObj));
+        }
 
         var stats = new Statistics(dOps, rOps);
         if (collectObjectives) {
@@ -99,7 +108,9 @@ public class ALNS {
             var dOp = dOps.get(dIdx);
             var rOp = rOps.get(rIdx);
 
-            // logger.fine("Selected operators %s and %s.".formatted(dOp.name(), rOp.name()));
+            if (log != null) {
+                log.fine("Selected operators: %s and %s".formatted(dOp.name(), rOp.name()));
+            }
 
             State destroyed = dOp.operator().apply(curr, rng);
             State cand = rOp.operator().apply(destroyed, rng);
@@ -134,9 +145,13 @@ public class ALNS {
                 stats.collectObjective(System.nanoTime() - started, curr.objective());
             }
         }
-        stats.setTotalRuntime(System.nanoTime() - started);
+        var totalRuntime = System.nanoTime() - started;
+        stats.setTotalRuntime(totalRuntime);
 
-        // logger.info("Finished iterating in %.2fs.".formatted(stats.getTotalRuntime()));
+        if (log != null) {
+            log.info("Finished iterating in %.2fs, best objective: %.2f".formatted(
+                    totalRuntime / 1_000_000_000.0, best.objective()));
+        }
 
         return new Result(best, stats);
     }
@@ -171,7 +186,9 @@ public class ALNS {
         }
 
         if (cand.objective() < best.objective()) {
-            // logger.info("New best with objective %.2f.".formatted(cand.objective()));
+            if (log != null) {
+                log.info("New best solution: %.2f".formatted(cand.objective()));
+            }
             outcome = Outcome.BEST;
         }
 
